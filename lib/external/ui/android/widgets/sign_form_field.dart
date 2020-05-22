@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:form_field_validator/form_field_validator.dart';
 
 class SignFormField extends StatelessWidget {
   final FormFieldValidator<String> validator;
@@ -14,7 +13,8 @@ class SignFormField extends StatelessWidget {
     @required this.label,
     this.keyboard,
     this.obscureText = false,
-    this.onChanged, this.fontSize = 15,
+    this.onChanged,
+    this.fontSize = 15,
   }) : super(key: key);
 
   @override
@@ -39,7 +39,8 @@ class SignFormField extends StatelessWidget {
             style: TextStyle(fontSize: fontSize),
             decoration: const InputDecoration(
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               fillColor: Colors.white,
               filled: true,
               focusedBorder: OutlineInputBorder(
@@ -62,9 +63,9 @@ class SignFormField extends StatelessWidget {
                 borderRadius: radius,
                 borderSide: BorderSide(color: Colors.transparent, width: 0),
               ),
-              
-              errorStyle: TextStyle(
-              ),floatingLabelBehavior: FloatingLabelBehavior.never,
+
+              errorStyle: TextStyle(),
+              floatingLabelBehavior: FloatingLabelBehavior.never,
               errorMaxLines: 1,
             ),
             validator: validator ??
@@ -80,4 +81,3 @@ class SignFormField extends StatelessWidget {
     );
   }
 }
-

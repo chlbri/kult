@@ -7,18 +7,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:kult/external/ui/android/screens/SplashScreen.dart';
-import 'package:kult/external/ui/android/screens/SignUp.dart';
-import 'package:kult/external/ui/android/screens/SignIn.dart';
+import 'package:kult/external/ui/android/screens/splashscreen.dart';
+import 'package:kult/external/ui/android/screens/sign_up.dart';
+import 'package:kult/external/ui/android/screens/sign_in.dart';
+import 'package:kult/external/ui/android/screens/home.dart';
 
 abstract class Routes {
   static const i = '/';
   static const signUp = '/sign-up';
   static const signIn = '/sign-in';
+  static const home = '/home';
   static const all = {
     i,
     signUp,
     signIn,
+    home,
   };
 }
 
@@ -55,6 +58,11 @@ class Router extends RouterBase {
         final typedArgs = args as SignInArguments ?? SignInArguments();
         return MaterialPageRoute<dynamic>(
           builder: (context) => SignIn(key: typedArgs.key),
+          settings: settings,
+        );
+      case Routes.home:
+        return MaterialPageRoute<dynamic>(
+          builder: (context) => Home(),
           settings: settings,
         );
       default:

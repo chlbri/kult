@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../contrats/screen.dart';
 
 import '../../contrats/screen_routing.dart';
 import '../router/router.gr.dart';
 
 const minButtonWidth = 120.0;
 
-class SplashScreen extends StatelessWidget with ScreenRouting {
+class SplashScreen extends Screen with ScreenRouting {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +47,8 @@ class SplashScreen extends StatelessWidget with ScreenRouting {
                             pushNamed(Routes.signIn),
                         child: Text(
                           "Se Connecter",
-                          style: TextStyle(color: Colors.yellow[300], fontSize: 17),
+                          style: TextStyle(
+                              color: Colors.yellow[300], fontSize: 17),
                         ),
                       ),
                     ),

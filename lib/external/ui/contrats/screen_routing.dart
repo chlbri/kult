@@ -1,9 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/widgets.dart';
+import 'package:kult/external/ui/contrats/screen.dart';
 
 import '../android/router/router.gr.dart';
 
-mixin ScreenRouting on Widget {
+mixin ScreenRouting on Screen {
   @protected
   Future pushNamed(
     String route, {
