@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "127351552496",
+    "firebase_url": "https://kult-51ad3.firebaseio.com",
+    "project_id": "kult-51ad3",
+    "storage_bucket": "kult-51ad3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:127351552496:android:fb6a2f296f2431e205c535",
+        "android_client_info": {
+          "package_name": "com.beme.kult"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "127351552496-4jeugat8c2okoibrq12rh7memfebha6i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.beme.kult",
+            "certificate_hash": "200a2634b9e977dcc1c77d979f3d394fc7e49cbc"
+          }
+        },
+        {
+          "client_id": "127351552496-gj1f93j4jrppn2jnio7mfod080piiqre.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPiZLqtTeIHmIsCwy-znlh9LmXoCnh9uA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "127351552496-gj1f93j4jrppn2jnio7mfod080piiqre.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

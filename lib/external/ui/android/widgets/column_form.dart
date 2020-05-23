@@ -13,6 +13,7 @@ class ColumnForm extends StatelessWidget {
       key: formKey,
       child: IntrinsicWidth(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: children ?? [SizedBox.expand()],
         ),
       ),

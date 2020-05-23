@@ -1,4 +1,4 @@
-package com.example.kult
+package com.beme.kult
 
 import io.flutter.embedding.android.FlutterActivity
 

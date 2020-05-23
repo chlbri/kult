@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:kult/external/ui/android/router/router.gr.dart';
-import 'package:kult/external/ui/android/widgets/column_form.dart';
+import 'package:kult/external/datasources/firebase/functions/auth_service.dart';
+import '../router/router.gr.dart';
+import '../widgets/column_form.dart';
 import 'input_screen.dart';
 import '../../contrats/screen.dart';
 
@@ -16,6 +17,7 @@ class SignIn extends Screen with ScreenRouting {
     final _formKey = GlobalKey<FormState>();
     final _scaffoldState = GlobalKey<ScaffoldState>();
 
+    final _auth = AuthService();
     return InputScreen(
       scaffoldKey: _scaffoldState,
       background: BoxDecoration(
@@ -25,11 +27,14 @@ class SignIn extends Screen with ScreenRouting {
         ),
       ),
       children: [
-        Image.asset('assets/img/header_txt.png', height: 30),
-        SizedBox(height: 50),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Image.asset('assets/img/header_txt.png', height: 30),
+        ),
+        SizedBox(height: 30),
         SvgPicture.asset(
           'assets/svg/connection_header_txt.svg',
-          height: 60,
+          height: 40,
         ),
         SizedBox(height: 120),
         ColumnForm(
@@ -60,15 +65,9 @@ class SignIn extends Screen with ScreenRouting {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
               ),
-              onPressed: () {
-                if (_formKey.currentState.validate()) {
-                  _scaffoldState.currentState.showSnackBar(
-                    SnackBar(
-                      content: Text('Inscription ...'),
-                      duration: Duration(milliseconds: 200),
-                    ),                  );
-                  pushNamed(Routes.home);
-                }
+              onPressed: () async {
+                _signIn(_formKey, _scaffoldState);
+                await _auth.signInAnon();
               },
               child: const Text(
                 "Se connecter",
@@ -79,5 +78,20 @@ class SignIn extends Screen with ScreenRouting {
         ),
       ],
     );
+  }
+
+  _signIn(
+    GlobalKey<FormState> _formKey,
+    GlobalKey<ScaffoldState> _scaffoldState,
+  ) {
+    if (_formKey.currentState.validate()) {
+      _scaffoldState.currentState.showSnackBar(
+        SnackBar(
+          content: Text('Connexion ...'),
+          duration: Duration(milliseconds: 200),
+        ),
+      );
+      pushNamed(Routes.home);
+    }
   }
 }

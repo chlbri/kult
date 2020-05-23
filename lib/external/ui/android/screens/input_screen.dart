@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kult/external/ui/android/widgets/screen_background.dart';
+import '../widgets/screen_background.dart';
 import '../../contrats/screen.dart';
 
 ///
@@ -41,11 +41,14 @@ class InputScreen extends Screen {
                     color: Colors.grey[100],
                   ),
               child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(15, 50, 15, 50),
-                child: Column(
-                  children: children,
-                ),
-              ),
+                  child: Container(
+                    margin: EdgeInsets.symmetric(
+                      vertical: 50,
+                    ),
+                    child: Column(
+                      children: children,
+                    ),
+                  )),
             ),
           ),
           ...stackedFields,

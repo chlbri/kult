@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:kult/external/ui/android/router/router.gr.dart';
 import 'package:kult/external/ui/android/widgets/column_form.dart';
-import 'input_screen.dart';
 import '../../contrats/screen.dart';
 import '../widgets/colum_form_separator.dart';
 import '../widgets/sign_form_field.dart';
 import '../../contrats/screen_routing.dart';
+import 'input_screen.dart';
 
 const requiredField = 'Champ obligatoire';
 
@@ -27,8 +28,11 @@ class SignUp extends Screen with ScreenRouting {
         ),
       ),
       children: <Widget>[
-        Image.asset('assets/img/header_txt.png'),
-        SizedBox(height: 50),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Image.asset('assets/img/header_txt.png', height: 30),
+        ),
+        SizedBox(height: 30),
         SvgPicture.asset(
           'assets/svg/inscription_header_txt.svg',
           height: 60,
@@ -80,34 +84,58 @@ class SignUp extends Screen with ScreenRouting {
             ),
           ],
         ),
-      ],
-      stackedFields: <Widget>[
-        Positioned(
-          bottom: 20,
-          child: Container(
-            child: ButtonTheme(
-              minWidth: 200,
-              child: FlatButton(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                onPressed: () => {
-                  if (_formKey.currentState.validate())
-                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-                      content: Text('Inscription ...'),
-                      duration: Duration(milliseconds: 700),
-                    ))
-                },
-                child: const Text(
-                  "S'inscrire",
-                  style: TextStyle(color: Color(0xFF25A3BC), fontSize: 18),
-                ),
-              ),
+        SizedBox(height: 70),
+        ButtonTheme(
+          minWidth: 200,
+          child: FlatButton(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            onPressed: _signUp(_formKey, _scaffoldKey),
+            child: const Text(
+              "S'inscrire",
+              style: TextStyle(color: Color(0xFF25A3BC), fontSize: 18),
             ),
           ),
         ),
       ],
+      stackedFields: <Widget>[
+        // Positioned(
+        //   bottom: 20,
+        //   child: ButtonTheme(
+        //     minWidth: 200,
+        //     child: FlatButton(
+        //       color: Colors.white,
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(15.0),
+        //       ),
+        //       onPressed: _signUp(_formKey, _scaffoldKey),
+        //       child: const Text(
+        //         "S'inscrire",
+        //         style: TextStyle(color: Color(0xFF25A3BC), fontSize: 18),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+      ],
     );
+  }
+
+  _signUp(
+    GlobalKey<FormState> _formKey,
+    GlobalKey<ScaffoldState> _scaffoldState,
+  ) {
+    return () {
+      if (_formKey.currentState.validate()) {
+        _scaffoldState.currentState.showSnackBar(
+          SnackBar(
+            content: Text('Inscription ...'),
+            duration: Duration(milliseconds: 200),
+          ),
+        );
+        pushNamed(Routes.home);
+      }
+    };
   }
 }
