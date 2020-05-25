@@ -33,6 +33,10 @@ dependencies:
   carousel_slider: ^2.1.0
   flutter_multi_carousel: ^1.0.0
   firebase_auth: ^0.16.0
+  cloud_firestore: ^0.13.5
+  json_schema: ^2.2.1
+  rflutter_alert: ^1.0.2
+  auto_size_text: ^2.1.0
 
 dev_dependencies:
   flutter_test:

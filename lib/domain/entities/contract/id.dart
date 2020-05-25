@@ -1,0 +1,5 @@
+
+mixin Id{
+  String id;
+} 
+
