@@ -1,4 +1,3 @@
-import 'package:kult/core/utils.dart';
 import 'package:meta/meta.dart';
 
 class Update<T> {

@@ -4,25 +4,27 @@
 // AutoRouteGenerator
 // **************************************************************************
 
-import 'package:auto_route/auto_route.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:kult/ui/android/screens/home.dart';
-import 'package:kult/ui/android/screens/sign_in.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:auto_route/auto_route.dart';
+import '../screens/initial.dart';
 import 'package:kult/ui/android/screens/sign_up.dart';
-import 'package:kult/ui/android/screens/splashscreen.dart';
-
+import 'package:kult/ui/android/screens/sign_in.dart';
+import 'package:kult/ui/android/screens/home.dart';
+import 'package:kult/ui/android/screens/register_many.dart';
 
 abstract class Routes {
   static const i = '/';
   static const signUp = '/sign-up';
   static const signIn = '/sign-in';
   static const home = '/home';
+  static const register = '/register';
   static const all = {
     i,
     signUp,
     signIn,
     home,
+    register,
   };
 }
 
@@ -40,7 +42,7 @@ class Router extends RouterBase {
     switch (settings.name) {
       case Routes.i:
         return MaterialPageRoute<dynamic>(
-          builder: (context) => SplashScreen(),
+          builder: (context) => Initial(),
           settings: settings,
         );
       case Routes.signUp:
@@ -66,6 +68,16 @@ class Router extends RouterBase {
           builder: (context) => Home(),
           settings: settings,
         );
+      case Routes.register:
+        if (hasInvalidArgs<RegisterManyArguments>(args)) {
+          return misTypedArgsRoute<RegisterManyArguments>(args);
+        }
+        final typedArgs =
+            args as RegisterManyArguments ?? RegisterManyArguments();
+        return MaterialPageRoute<dynamic>(
+          builder: (context) => RegisterMany(key: typedArgs.key),
+          settings: settings,
+        );
       default:
         return unknownRoutePage(settings.name);
     }
@@ -86,4 +98,10 @@ class SignUpArguments {
 class SignInArguments {
   final Key key;
   SignInArguments({this.key});
+}
+
+//RegisterMany arguments holder class
+class RegisterManyArguments {
+  final Key key;
+  RegisterManyArguments({this.key});
 }

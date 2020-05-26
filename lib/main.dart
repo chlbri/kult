@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kult/data/datasources/firebase/services/auth.dart';
 
 import 'ui/android/router/router.gr.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      builder: ExtendedNavigator<Router>(router: Router()),
+      builder: ExtendedNavigator<Router>(router: Router(), ),
     );
   }
 }

@@ -4,47 +4,10 @@ import 'package:kult/data/datasources/firebase/member.dart';
 import 'package:kult/data/models/choice.dart';
 import 'package:kult/data/models/member.dart';
 import 'package:kult/domain/entities/choice_list.dart';
+import 'package:kult/ui/contrats/screen_routing.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'kult_choice_button.dart';
 
-extension ChoiceListExtension on ChoiceList {
-  String get text {
-    String out;
-    switch (this) {
-      case ChoiceList.SAMEDI1:
-        out = 'Samedi 8h à 10h';
-        break;
-      case ChoiceList.SAMEDI2:
-        out = 'Samedi 11h à 13h';
-        break;
-      case ChoiceList.DIMANCHE1:
-        out = 'Dimanche 7h30 à 9h30';
-        break;
-      case ChoiceList.DIMANCHE2:
-        out = 'Dimanche 11h à 13h';
-        break;
-    }
-    return out;
-  }
-
-  String get msg {
-    String out;
-    switch (this) {
-      case ChoiceList.SAMEDI1:
-        out = 'qui se tiendra ce samedi, de 8h à 10h';
-        break;
-      case ChoiceList.SAMEDI2:
-        out = 'qui se tiendra ce samedi, de 11h à 13h';
-        break;
-      case ChoiceList.DIMANCHE1:
-        out = 'qui se tiendra ce dimanche, de 7h30 à 9h30';
-        break;
-      case ChoiceList.DIMANCHE2:
-        out = 'qui se tiendra ce dimanche, de 11h à 13h';
-        break;
-    }
-    return out;
-  }
-}
 
 final alertStyle = AlertStyle(
   animationType: AnimationType.fromTop,
@@ -63,28 +26,29 @@ final alertStyle = AlertStyle(
   ),
 );
 
-class KultChoiceButton extends StatefulWidget {
+class KultChoiceButtonOther extends StatefulWidget with ScreenRouting {
   final IconData iconData;
   final ChoiceList choice;
   final EdgeInsetsGeometry margin;
-  final String uid;
   final bool enabled, alert;
+  final bool Function() ableToRegister;
+  final MemberModel model;
 
-  const KultChoiceButton({
+  const KultChoiceButtonOther({
     Key key,
     this.iconData,
     this.margin,
     @required this.choice,
     this.enabled = true,
-    @required this.uid,
     this.alert = true,
+    @required this.model, this.ableToRegister,
   }) : super(key: key);
 
   @override
-  _KultChoiceButtonState createState() => _KultChoiceButtonState();
+  _KultChoiceButtonOtherState createState() => _KultChoiceButtonOtherState();
 }
 
-class _KultChoiceButtonState extends State<KultChoiceButton> {
+class _KultChoiceButtonOtherState extends State<KultChoiceButtonOther> {
   bool switcher = true;
 
   @override
@@ -96,18 +60,25 @@ class _KultChoiceButtonState extends State<KultChoiceButton> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final alertMsg = StringBuffer();
+    final model = widget.model;
+    alertMsg.write(model.lastName ?? model.firstNames ?? "Inconnu");
+    alertMsg.write(' ');
+    alertMsg.write(switcher ? "sera convié au culte" : "ne participeras plus au culte");
+    alertMsg.write(' ');
+    alertMsg.write(widget.choice.msg);
+    alertMsg.write('.');
     final alert = Alert(
       context: context,
       style: alertStyle,
       type: AlertType.info,
       title: "Choix éffectué",
-      desc:
-          "${switcher ? "Tu es convié au culte" : "Tu ne participeras plus au culte"} ${widget.choice.msg}.",
+      desc: alertMsg.toString(),
       content: SizedBox(width: 10),
       buttons: [
         DialogButton(
           child: Text(
-            "Sois béni",
+            "OK",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
           onPressed: () => Navigator.pop(context),
@@ -144,14 +115,13 @@ class _KultChoiceButtonState extends State<KultChoiceButton> {
             )
           ],
         ),
-        onPressed: switcher
+        onPressed:  switcher
             ? () async {
-              final uuid =  await ChoiceSource.uid;
-              print(uuid);
-                if (await ChoiceSource().addOne(
-                  widget.choice,
-                  widget.uid ?? uuid,
-                )) {
+                if (widget.ableToRegister() && widget.model != null &&
+                    await ChoiceSource().addOneAfter(
+                      widget.model,
+                      widget.choice,
+                    )) {
                   if (widget.alert) alert.show();
                   setState(() {
                     switcher = false;
@@ -159,13 +129,11 @@ class _KultChoiceButtonState extends State<KultChoiceButton> {
                 }
               }
             : () async {
-                final check = await ChoiceSource().removeOne(
-                  widget.choice,
-                  widget.uid ?? await ChoiceSource.uid,
-                );
-                print('checking ...');
-                print(check);
-                if (check) {
+                if (widget.ableToRegister() && widget.model != null &&
+                    await ChoiceSource().removeOne(
+                      widget.choice,
+                      widget.model.uid,
+                    )) {
                   if (widget.alert) alert.show();
                   setState(() {
                     switcher = true;

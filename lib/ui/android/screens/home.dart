@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kult/data/datasources/firebase/choice.dart';
+import 'package:kult/data/datasources/firebase/services/auth.dart';
+import 'package:kult/data/models/choice.dart';
 import 'package:kult/domain/entities/choice_list.dart';
 import 'package:kult/ui/android/router/router.gr.dart';
 import 'package:kult/ui/android/widgets/carousel_card.dart';
@@ -18,7 +21,6 @@ final alertStyle = AlertStyle(
   descStyle: const TextStyle(fontWeight: FontWeight.bold),
   buttonAreaPadding: EdgeInsets.all(7),
   animationDuration: Duration(milliseconds: 700),
-  
   alertBorder: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(15.0),
     side: BorderSide(
@@ -30,10 +32,74 @@ final alertStyle = AlertStyle(
   ),
 );
 
-class Home extends Screen with ScreenRouting {
+class Home extends Screen {
+  @override
+  Widget build(BuildContext context) => FutureHome();
+}
+
+class FutureHome extends StatefulWidget with ScreenRouting {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<FutureHome> {
+  Future<ChoiceModel> _futureFonction() async {
+    final uid = await ChoiceSource.uid;
+
+    return ChoiceSource().read(uid).then(
+      (value) {
+        print('Future ...');
+        print(uid);
+        if (value != null) {
+          return ChoiceModel.fromJson(value)..uid = uid;
+        }
+        return null;
+      },
+    );
+  }
+
+  bool refreshOnce = true;
+  Future<ChoiceModel> get _future async => await _futureFonction();
+
+  
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final out = refreshOnce
+        ? FutureBuilder(
+            future: _future,
+            builder: (ctx, snap) {
+              if (snap.connectionState == ConnectionState.done) {
+                print(snap.data);
+                return SuccessHomeScreen(
+                  snap: snap,
+                );
+              } else {
+                return Scaffold(
+                  body: Center(
+                    child: Text('Pas de connexion Internet'),
+                  ),
+                );
+              }
+            },
+          )
+        : Scaffold();
+    // refreshOnce = false;
+    return out;
+  }
+}
+
+class SuccessHomeScreen extends Screen with ScreenRouting {
+  const SuccessHomeScreen({
+    Key key,
+    @required this.snap,
+  }) : super(key: key);
+
+  final AsyncSnapshot snap;
+
+  @override
+  Widget build(BuildContext context) {
     final alertConnection = Alert(
       context: context,
       style: alertStyle,
@@ -69,16 +135,19 @@ class Home extends Screen with ScreenRouting {
       // desc: "Confirmez votre déconnexion",
       buttons: [
         DialogButton(
-          child: Text(
+          child: const Text(
             "Quitter",
-            style: TextStyle(color: Color(0xFFE99B22), fontSize: 20),
+            style: TextStyle(
+              color: Color(0xFFE99B22),
+              fontSize: 20,
+            ),
           ),
           onPressed: () => pop(true),
           color: Colors.white,
           radius: BorderRadius.circular(10.0),
         ),
         DialogButton(
-          child: Text(
+          child: const Text(
             "Rester",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
@@ -88,6 +157,9 @@ class Home extends Screen with ScreenRouting {
         ),
       ],
     );
+    print('The snap...');
+    print(snap.data != null);
+    final size = MediaQuery.of(context).size;
     return WillPopScope(
       onWillPop: () {
         return alertExit.show();
@@ -105,7 +177,7 @@ class Home extends Screen with ScreenRouting {
           child: Column(
             children: <Widget>[
               Image.asset('assets/img/header_txt.png', height: 30),
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
@@ -177,13 +249,14 @@ class Home extends Screen with ScreenRouting {
                 ],
               ),
               SizedBox(height: size.height / 30),
-              KultChoices(),
+              KultChoices(snap: snap),
               SizedBox(height: size.height / 50),
               SvgPicture.asset(
                 'assets/svg/church_life_txt.svg',
                 height: 40,
               ),
-              InProgressWidget(
+              SizedBox(height: size.height / 30),
+              const InProgressWidget(
                 children: <Widget>[
                   CarouselCard(
                     image: "assets/img/pleading_image.png",
@@ -203,6 +276,141 @@ class Home extends Screen with ScreenRouting {
           ),
         ),
       ),
+    );
+  }
+}
+
+class KultChoices extends StatelessWidget with ScreenRouting {
+  const KultChoices({
+    Key key,
+    @required this.snap,
+  }) : super(key: key);
+
+  final AsyncSnapshot snap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: <Widget>[
+            const Expanded(
+              flex: 1,
+              child: SizedBox(
+                height: 5,
+                child: DecoratedBox(
+                  //position: DecorationPosition.foreground,
+                  decoration: BoxDecoration(color: Colors.white),
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Column(
+              children: <Widget>[
+                const Text(
+                  'FAIS TON',
+                  style: TextStyle(
+                    fontSize: 20,
+                    decoration: TextDecoration.none,
+                    fontFamily: 'Lato',
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const Text(
+                  'CHOIX',
+                  style: TextStyle(
+                    fontSize: 25,
+                    decoration: TextDecoration.none,
+                    fontFamily: 'Lato',
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              flex: 1,
+              child: SizedBox(
+                height: 5,
+                child: DecoratedBox(
+                  //position: DecorationPosition.foreground,
+                  decoration: BoxDecoration(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 2),
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Transform.rotate(
+                angle: -pi / 7,
+                child: Image.asset(
+                  'assets/img/kult_choice_phone.png',
+                ),
+              ),
+            ),
+            IntrinsicWidth(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: ChoiceList.values
+                    .map(
+                      (e)  => KultChoiceButton(
+                        uid: snap.data?.uid ,
+                        enabled: snap.data != null ?
+                            snap.data.choices?.contains(e) == false : true,
+                        choice: e,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
+        RaisedButton(
+          // padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+              side: BorderSide(
+                color: Colors.white,
+                width: 2,
+              )),
+          color: Colors.red,
+          splashColor: Colors.black45,
+          textColor: Colors.white,
+          onPressed: () {
+            pushNamed(Routes.register);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                Icons.group_add,
+                size: 50,
+              ),
+              SizedBox(width: 20),
+              Text(
+                "Inscrire d'autres personnes",
+                style: TextStyle(fontSize: 18),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 10),
+          width: double.infinity,
+          height: 5,
+          decoration: BoxDecoration(color: Colors.white),
+        )
+      ],
     );
   }
 }
@@ -262,129 +470,6 @@ class InProgressWidget extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class KultChoices extends StatefulWidget {
-  const KultChoices({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  _KultChoicesState createState() => _KultChoicesState();
-}
-
-class _KultChoicesState extends State<KultChoices> {
-  bool switcher = true;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    switcher = true;
-  }
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: SizedBox(
-                height: 5,
-                child: DecoratedBox(
-                  //position: DecorationPosition.foreground,
-                  decoration: BoxDecoration(color: Colors.white),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Column(
-              children: <Widget>[
-                Text(
-                  'FAIS TON',
-                  style: TextStyle(
-                    fontSize: 20,
-                    decoration: TextDecoration.none,
-                    fontFamily: 'Lato',
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  'CHOIX',
-                  style: TextStyle(
-                    fontSize: 25,
-                    decoration: TextDecoration.none,
-                    fontFamily: 'Lato',
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              flex: 1,
-              child: SizedBox(
-                height: 5,
-                child: DecoratedBox(
-                  //position: DecorationPosition.foreground,
-                  decoration: BoxDecoration(color: Colors.white),
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 2),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: Transform.rotate(
-                angle: -pi / 7,
-                child: Image.asset(
-                  'assets/img/kult_choice_phone.png',
-                ),
-              ),
-            ),
-            IntrinsicWidth(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: ChoiceList.values
-                    .map((e) => KultChoiceButton(
-                          choice: e,
-                          switcher: switcher,
-                          onPressed: () {
-                            // setState(() {
-                            //   switcher = false;
-                            // });
-                          },
-                        ))
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 10),
-          width: double.infinity,
-          height: 5,
-          decoration: BoxDecoration(color: Colors.white),
-        )
-      ],
     );
   }
 }

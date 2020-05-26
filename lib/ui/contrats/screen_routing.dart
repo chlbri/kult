@@ -4,8 +4,7 @@ import 'package:kult/ui/contrats/screen.dart';
 
 import '../android/router/router.gr.dart';
 
-mixin ScreenRouting on Screen {
-  @protected
+mixin ScreenRouting on Widget {
   Future pushNamed(
     String route, {
     Object arguments,
@@ -19,7 +18,6 @@ mixin ScreenRouting on Screen {
     );
   }
 
-  @protected
   Future pushReplacementNamed(
     String route, {
     Object result,
@@ -35,7 +33,6 @@ mixin ScreenRouting on Screen {
     );
   }
 
-  @protected
   Future popAndPushNamed(
     String route, {
     Object result,
@@ -49,12 +46,10 @@ mixin ScreenRouting on Screen {
     );
   }
 
-  @protected
   void pop<T>([T result]) {
     return ExtendedNavigator.ofRouter<Router>().pop(result);
   }
 
-  @protected
   Future pushNamedAndRemoveUntil(
     String route,
     RoutePredicate predicate, {

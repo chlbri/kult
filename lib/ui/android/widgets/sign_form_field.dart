@@ -6,6 +6,7 @@ class SignFormField extends StatelessWidget {
   final TextInputType keyboard;
   final bool obscureText;
   final ValueChanged<String> onChanged;
+  final VoidCallback onEdititingComplete;
   final double fontSize;
   const SignFormField({
     Key key,
@@ -14,7 +15,7 @@ class SignFormField extends StatelessWidget {
     this.keyboard,
     this.obscureText = false,
     this.onChanged,
-    this.fontSize = 15,
+    this.fontSize = 15, this.onEdititingComplete,
   }) : super(key: key);
 
   @override
@@ -33,6 +34,7 @@ class SignFormField extends StatelessWidget {
         SizedBox(
           width: 200,
           child: TextFormField(
+            onEditingComplete: onEdititingComplete ?? () => null,
             onChanged: onChanged,
             obscureText: obscureText,
             keyboardType: keyboard ?? TextInputType.text,

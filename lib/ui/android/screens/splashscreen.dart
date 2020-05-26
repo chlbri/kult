@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import '../../contrats/screen.dart';
-
-import '../../contrats/screen_routing.dart';
-import '../router/router.gr.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:kult/ui/android/router/router.gr.dart';
+import 'package:kult/ui/contrats/screen.dart';
+import 'package:kult/ui/contrats/screen_routing.dart';
 
 const minButtonWidth = 120.0;
 
-class SplashScreen extends Screen with ScreenRouting {
+class Splashscreen extends StatelessWidget with ScreenRouting {
+  const Splashscreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

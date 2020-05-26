@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 abstract class Checker {
   bool call();
 }
@@ -72,6 +70,9 @@ extension MapExtension<K, V> on Map<K, V> {
     if (isNullAny([value, key])) return;
     this[key] = value;
   }
+  static void aller(){
+
+  }
 }
 
 bool checkTypes(List<Checker> toCheck) {
@@ -81,6 +82,9 @@ bool checkTypes(List<Checker> toCheck) {
 }
 
 bool isNull(arg) => arg == null;
+bool isNullString(String arg) => arg == null || arg.isEmpty || arg == '';
 
 bool isNullList(List args) => args.every(isNull);
 bool isNullAny(List args) => args.any(isNull);
+
+bool isNullStringAny(List<String> args) => args.any(isNullString);

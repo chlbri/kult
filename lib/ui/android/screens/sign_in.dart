@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:kult/data/datasources/firebase/choice.dart';
 import 'package:kult/data/datasources/firebase/member.dart';
 import 'package:kult/data/datasources/firebase/services/auth.dart';
+import 'package:kult/data/models/choice.dart';
 import 'package:kult/data/models/member.dart';
 import 'package:kult/domain/entities/member.dart';
 import '../router/router.gr.dart';
@@ -100,6 +102,7 @@ class SignIn extends Screen with ScreenRouting {
         ),
       );
       if (await MemberSource(model).signIn()) {
+        
         pushNamedAndRemoveUntil(Routes.home, (route) => false);
       }
     }
