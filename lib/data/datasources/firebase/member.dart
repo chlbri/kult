@@ -3,21 +3,38 @@ import 'package:kult/data/datasources/firebase/choice.dart';
 import 'package:kult/data/datasources/firebase/services/auth.dart';
 import 'package:kult/data/datasources/firebase/services/database.dart';
 import 'package:kult/data/models/member.dart';
+import 'package:kult/domain/entities/member.dart';
 
-class MemberSource extends DataBaseService {
-  final MemberModel member;
-  final auth = AuthService();
+class FirestoreMemberSource extends FireStoreService<MemberModel> {
+  MemberModel member;
+  final _auth = FirebaseAuthService();
 
-  MemberSource([this.member]) : super("Member", member);
+  FirestoreMemberSource([this.member]) : super("Member", member);
+
+    static Future<String> get getUserUid {
+    return FirebaseAuthService().currentUser.then(
+          (value) => value.uid,
+        );
+  }
 
   Future<bool> signIn() {
-    return auth.signInWithEmailAndPassword(
+    return _auth.signInWithEmailAndPassword(
       member.login,
       member.mdp,
     );
   }
 
-  Future<bool> create() async {
+  Future<Member> read(String uid) {
+    return collection.document(uid).get().then(
+      (value) {
+        return MemberModel.fromJson(value.data);
+      },
+    ).catchError(
+      (_) => null,
+    );
+  }
+
+  Future<bool> create(MemberModel model) async {
     final json = model.toJson();
     return collection.add(json..remove("mdp")..remove("uid")).then(
       (val) {
@@ -36,7 +53,7 @@ class MemberSource extends DataBaseService {
 
   Future<bool> signUp() async {
     try {
-      return auth
+      return _auth
           .signUpWithEmailAndPassword(
             member.login,
             member.mdp,

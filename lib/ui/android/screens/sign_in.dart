@@ -23,7 +23,7 @@ class SignIn extends Screen with ScreenRouting {
     final _formKey = GlobalKey<FormState>();
     final _scaffoldState = GlobalKey<ScaffoldState>();
 
-    final _auth = AuthService();
+    final _auth = FirebaseAuthService();
     return InputScreen(
       scaffoldKey: _scaffoldState,
       background: BoxDecoration(
@@ -48,13 +48,13 @@ class SignIn extends Screen with ScreenRouting {
           children: [
             SignFormField(
               label: 'Email / Tél',
-              onChanged: (value) => model.login = value,
+              onChanged: (value) => model.login = value.trim(),
               validator: RequiredValidator(errorText: "Champ requis"),
             ),
             const SizedBox(height: 50),
             SignFormField(
               label: 'Mot de passe',
-              onChanged: (value) => model.mdp = value,
+              onChanged: (value) => model.mdp = value.trim(),
               validator: RequiredValidator(errorText: "Champ requis"),
               obscureText: true,
               keyboard: TextInputType.visiblePassword,
@@ -101,7 +101,7 @@ class SignIn extends Screen with ScreenRouting {
           duration: Duration(seconds: 1),
         ),
       );
-      if (await MemberSource(model).signIn()) {
+      if (await FirestoreMemberSource(model).signIn()) {
         
         pushNamedAndRemoveUntil(Routes.home, (route) => false);
       }

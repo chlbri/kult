@@ -87,4 +87,6 @@ bool isNullString(String arg) => arg == null || arg.isEmpty || arg == '';
 bool isNullList(List args) => args.every(isNull);
 bool isNullAny(List args) => args.any(isNull);
 
+bool checkFunction(bool Function() arg) => arg == null || arg();
+
 bool isNullStringAny(List<String> args) => args.any(isNullString);

@@ -9,7 +9,7 @@ class PhoneResult {
   const PhoneResult({@required this.verificationId, @required this.user});
 }
 
-class AuthService {
+class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   ///e connecter anonymement
@@ -24,6 +24,8 @@ class AuthService {
   }
 
   Future<FirebaseUser> get currentUser => _auth.currentUser();
+  Future<String> get currentUid =>
+      currentUser.then((val) => val.uid).catchError((_) => null);
 
   ///
   Future<PhoneResult> signInWithNumber({
@@ -103,7 +105,7 @@ class AuthService {
     } catch (e) {
       print(e);
       return false;
-    } finally{
+    } finally {
       print('');
     }
   }

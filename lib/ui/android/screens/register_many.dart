@@ -9,6 +9,7 @@ import 'package:kult/core/utils.dart';
 import 'package:kult/data/models/member.dart';
 import 'package:kult/domain/entities/choice_list.dart';
 import 'package:kult/ui/android/router/router.gr.dart';
+import 'package:kult/ui/android/widgets/checkbox_group.dart';
 import 'package:kult/ui/android/widgets/column_form.dart';
 import 'package:kult/ui/android/widgets/kult_choice_button.dart';
 import 'package:kult/ui/android/widgets/kult_choice_button_other.dart';
@@ -157,7 +158,8 @@ class _RegisterManyState extends State<RegisterMany> {
                   member.phoneNumber = val;
                 },
                 validator: MultiValidator([
-                  PatternValidator("[012345678][0-9]{7}", errorText: 'Numéro invalide'),
+                  PatternValidator("[012345678][0-9]{7}",
+                      errorText: 'Numéro invalide'),
                   RequiredValidator(errorText: "Champ requis"),
                 ]),
               ),
@@ -177,17 +179,26 @@ class _RegisterManyState extends State<RegisterMany> {
             ),
             IntrinsicWidth(
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: ChoiceList.values
-                      .map(
-                        (e) => KultChoiceButtonOther(
-                            ableToRegister: () {
-                              return _formKey.currentState.validate();
-                            },
-                            choice: e,
-                            model: member),
-                      )
-                      .toList()),
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CheckboxGroup(
+                    ableToRegister: () => _formKey.currentState.validate(),
+                    direction: Axis.vertical,
+                    model: () => member,
+                    alert: true,
+                  ),
+                  // ...ChoiceList.values
+                  //     .map(
+                  //       (e) => KultChoiceButtonOther(
+                  //           ableToRegister: () {
+                  //             return _formKey.currentState.validate();
+                  //           },
+                  //           choice: e,
+                  //           model: member),
+                  //     )
+                  //     .toList(),
+                ],
+              ),
             ),
           ],
         ),

@@ -1,4 +1,4 @@
-enum ChoiceList{
+enum ChoiceList {
   SAMEDI1,
   SAMEDI2,
   DIMANCHE1,

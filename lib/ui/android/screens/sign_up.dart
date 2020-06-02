@@ -145,7 +145,7 @@ class SignUp extends Screen with ScreenRouting {
         );
         "chlbri.blac@gmail.com";
         //member.login = member.lastName;
-        MemberSource(member).signUp();
+        FirestoreMemberSource(member).signUp();
         pushReplacementNamed(Routes.home);
       }
     };

@@ -1,9 +1,9 @@
 import 'package:kult/core/utils.dart';
 import 'package:kult/domain/entities/member.dart';
 
-import '../datasources/contracts/model.dart';
-import '../datasources/contracts/updates.dart';
-import '../datasources/contracts/update.dart';
+import '../contracts/model.dart';
+import '../contracts/updates.dart';
+import '../contracts/update.dart';
 
 class MemberModel extends Member with Model, Updates<Member> {
   MemberModel({
@@ -12,10 +12,18 @@ class MemberModel extends Member with Model, Updates<Member> {
     String mdp,
     String firstNames,
     String lastName,
-    int phoneNumber,
+    String phoneNumber,
     DateTime createdAt,
     DateTime deletedAt,
-  }) {
+  }) /* : assert(
+          !isNullAny([
+            firstNames,
+            lastName,
+            login,
+            phoneNumber,
+          ]),
+        ) */
+  {
     this.id = id;
     this.createdAt = createdAt;
     this.deletedAt = deletedAt;
@@ -23,7 +31,16 @@ class MemberModel extends Member with Model, Updates<Member> {
     this.mdp = mdp;
     this.firstNames = firstNames;
     this.lastName = lastName;
+    this.phoneNumber = phoneNumber;
   }
+
+  MemberModel.fromEntity(Member data)
+      : this(
+          firstNames: data.firstNames,
+          lastName: data.lastName,
+          login: data.login,
+          phoneNumber: data.phoneNumber,
+        );
 
   static bool validateJson(dynamic json) {
     return checkTypes([
@@ -38,9 +55,13 @@ class MemberModel extends Member with Model, Updates<Member> {
     ]);
   }
 
-  factory MemberModel.fromJson(Map<String, dynamic> json,
-      [bool withUpdates = false]) {
-    if (!validateJson(json)) return null;
+  factory MemberModel.fromJson(
+    Map<String, dynamic> json, [
+    bool withUpdates = false,
+  ]) {
+    // if (!validateJson(json)) return null;
+    print('fromJson...');
+    print(json);
     final out = MemberModel(
       createdAt: json["createdAt"],
       id: json["id"],

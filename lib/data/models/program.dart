@@ -1,9 +1,9 @@
 import 'package:kult/core/utils.dart';
 import 'package:kult/domain/entities/program.dart';
 
-import '../datasources/contracts/model.dart';
-import '../datasources/contracts/updates.dart';
-import '../datasources/contracts/update.dart';
+import '../contracts/model.dart';
+import '../contracts/updates.dart';
+import '../contracts/update.dart';
 
 class ProgramModel extends Program with Model, Updates<Program> {
   ProgramModel._(

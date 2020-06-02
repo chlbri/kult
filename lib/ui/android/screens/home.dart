@@ -1,13 +1,19 @@
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kult/data/datasources/firebase/choice.dart';
 import 'package:kult/data/datasources/firebase/services/auth.dart';
 import 'package:kult/data/models/choice.dart';
+import 'package:kult/domain/entities/choice.dart';
 import 'package:kult/domain/entities/choice_list.dart';
+import 'package:kult/domain/entities/member.dart';
+import 'package:kult/domain/usecases/choose_kult.dart';
+import 'package:kult/domain/usecases/register.dart';
 import 'package:kult/ui/android/router/router.gr.dart';
 import 'package:kult/ui/android/widgets/carousel_card.dart';
+import 'package:kult/ui/android/widgets/checkbox_group.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import '../widgets/kult_choice_button.dart';
 import '../widgets/screen_background.dart';
@@ -43,38 +49,39 @@ class FutureHome extends StatefulWidget with ScreenRouting {
 }
 
 class _HomeState extends State<FutureHome> {
-  Future<ChoiceModel> _futureFonction() async {
-    final uid = await ChoiceSource.uid;
-
-    return ChoiceSource().read(uid).then(
-      (value) {
-        print('Future ...');
-        print(uid);
-        if (value != null) {
-          return ChoiceModel.fromJson(value)..uid = uid;
-        }
-        return null;
-      },
-    );
+  Future<Member> _futureFonction() async {
+    final uid = await FirebaseAuthService().currentUid;
+    print("Home...");
+    print(uid);
+    return registerContainer
+        .read(
+          await FirebaseAuthService().currentUid,
+        )
+        .then(
+          (value) async => await Future.delayed(
+            Duration(seconds: 1),
+          ),
+        );
   }
 
   bool refreshOnce = true;
-  Future<ChoiceModel> get _future async => await _futureFonction();
-
-  
+  Future<Member> get _future => _futureFonction();
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     final out = refreshOnce
         ? FutureBuilder(
-            future: _future,
+            future: _futureFonction(),
             builder: (ctx, snap) {
               if (snap.connectionState == ConnectionState.done) {
-                print(snap.data);
-                return SuccessHomeScreen(
-                  snap: snap,
-                );
+                if (snap.hasData) {
+                  print(snap.data);
+                  return SuccessHomeScreen(
+                    snap: snap,
+                  );
+                }return SuccessHomeScreen(
+                    snap: snap,
+                  );
               } else {
                 return Scaffold(
                   body: Center(
@@ -360,16 +367,25 @@ class KultChoices extends StatelessWidget with ScreenRouting {
             IntrinsicWidth(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: ChoiceList.values
-                    .map(
-                      (e)  => KultChoiceButton(
-                        uid: snap.data?.uid ,
-                        enabled: snap.data != null ?
-                            snap.data.choices?.contains(e) == false : true,
-                        choice: e,
-                      ),
-                    )
-                    .toList(),
+                children: [
+                  CheckboxGroup(
+                    groupChoice: snap?.data?.choice,
+                    direction: Axis.vertical,
+                    model: () => snap?.data,
+                    alert: true,
+                  ),
+                  // ...ChoiceList.values
+                  //     .map(
+                  //       (e) => KultChoiceButton(
+                  //         uid: snap.data?.getUserUid,
+                  //         enabled: snap.data != null
+                  //             ? snap.data.groupChoice?.contains(e) == false
+                  //             : true,
+                  //         choice: e,
+                  //       ),
+                  //     )
+                  //     .toList()
+                ],
               ),
             ),
           ],

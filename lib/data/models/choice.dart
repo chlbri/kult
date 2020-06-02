@@ -1,16 +1,18 @@
 import 'package:kult/core/utils.dart';
 
-import '../datasources/contracts/model.dart';
-import '../datasources/contracts/updates.dart';
-import '../datasources/contracts/update.dart';
+import '../contracts/model.dart';
+import '../contracts/updates.dart';
+import '../contracts/update.dart';
 import 'package:kult/domain/entities/choice.dart';
 import 'package:kult/domain/entities/choice_list.dart';
 
 class ChoiceModel extends Choice with Model, Updates<Choice> {
-  ChoiceModel(List<ChoiceList> choice, [String id]) {
-    this.choices = choice;
-    this.id = id;
+  ChoiceModel(ChoiceList choice, [String uid]) {
+    this.choice = choice;
+    this.uid = uid;
   }
+
+  ChoiceModel.fromEntity(Choice data) : this(data?.choice);
 
   static bool validateJson(dynamic json) {
     return checkTypes([
@@ -18,7 +20,7 @@ class ChoiceModel extends Choice with Model, Updates<Choice> {
         (values) => values.every(
           (value) => 0 <= value && value < ChoiceList.values.length,
         ),
-        json["choices"],
+        json["choice"],
       ),
       TypeChecker2(DateTime, json["createdAt"]),
       TypeChecker2(String, json["id"]),
@@ -30,12 +32,9 @@ class ChoiceModel extends Choice with Model, Updates<Choice> {
     // print(json);
     // print(json['choice'].runtimeType);
     // if (!validateJson(json)) return null;
-    final list = <ChoiceList>[];
-    for (var item in json['choices']) {
-      list.add(ChoiceList.values[item]);
-    }
+
     final out = ChoiceModel(
-      list,
+      json['choice'],
       json['id'],
     );
     if (!withUpdates) return out;
@@ -58,7 +57,7 @@ class ChoiceModel extends Choice with Model, Updates<Choice> {
   Map<String, dynamic> toJson([bool withUpdates = false]) {
     final out = <String, dynamic>{};
     out.put('id', id);
-    out.put('choices', choices.map((e) => e.index).toList());
+    out.put('choice', choice.index);
     print(out);
     if (!withUpdates) return out;
     out['updates'] = updates;
