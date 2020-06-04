@@ -13,7 +13,7 @@ class ChooseKult {
     return repoChoice.update(data, uid: uid);
   }
 
-  Future remove(String uid) {
+  Future<bool> remove(String uid) {
     return repoChoice.delete(uid);
   }
   Future<Choice> read(String uid) {

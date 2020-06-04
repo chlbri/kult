@@ -12,7 +12,7 @@ class ChruchModel extends Church with Model, Updates<Church> {
     DateTime deletedAt,
   ]) {
     this.createdAt = createdAt;
-    this.id = id;
+    this.uid = id;
     this.deletedAt = deletedAt;
   }
 

@@ -5,5 +5,5 @@ import '../contract/repo.dart';
 
 abstract class IRepoMember extends Repo {
   Future<Member> read(String uid);
-  Future<bool> create(Member data);
+  Future<String> create(Member data);
 }

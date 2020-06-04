@@ -8,11 +8,11 @@ import '../contracts/update.dart';
 class DivisionModel extends Division with Model, Updates<Division> {
   DivisionModel._(
     DateTime createdAt,
-    String id, [
+    String uid, [
     DateTime deletedAt,
   ]) {
     this.createdAt = createdAt;
-    this.id = id;
+    this.uid = uid;
     this.deletedAt = deletedAt;
   }
 

@@ -8,18 +8,18 @@ import '../contracts/update.dart';
 class ProgramModel extends Program with Model, Updates<Program> {
   ProgramModel._(
     DateTime createdAt,
-    String id, [
+    String uid, [
     DateTime deletedAt,
   ]) {
     this.createdAt = createdAt;
-    this.id = id;
+    this.uid = uid;
     this.deletedAt = deletedAt;
   }
 
   static bool validateJson(dynamic json) {
     return checkTypes([
       TypeChecker2(DateTime, json["createdAt"]),
-      TypeChecker2(String, json["id"]),
+      TypeChecker2(String, json["uid"]),
       TypeChecker2(DateTime, json["deletedAt"]),
     ]);
   }
@@ -29,7 +29,7 @@ class ProgramModel extends Program with Model, Updates<Program> {
     if (!validateJson(json)) return null;
     final out = ProgramModel._(
       json['createdAt'],
-      json['id'],
+      json['uid'],
       json['deletedAt'],
     );
     if (!withUpdates) return out;

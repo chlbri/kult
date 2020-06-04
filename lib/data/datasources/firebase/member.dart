@@ -11,7 +11,7 @@ class FirestoreMemberSource extends FireStoreService<MemberModel> {
 
   FirestoreMemberSource([this.member]) : super("Member", member);
 
-    static Future<String> get getUserUid {
+  static Future<String> get getUserUid {
     return FirebaseAuthService().currentUser.then(
           (value) => value.uid,
         );
@@ -24,29 +24,26 @@ class FirestoreMemberSource extends FireStoreService<MemberModel> {
     );
   }
 
-  Future<Member> read(String uid) {
-    return collection.document(uid).get().then(
-      (value) {
-        return MemberModel.fromJson(value.data);
-      },
-    ).catchError(
-      (_) => null,
+  Future<Member> read(String uid) async {
+    final snap = await collection.document(uid).get();
+    return MemberModel.fromJson(
+      snap.data..['uid'] = uid,
     );
   }
 
-  Future<bool> create(MemberModel model) async {
+  Future<String> create(MemberModel model) async {
     final json = model.toJson();
     return collection.add(json..remove("mdp")..remove("uid")).then(
       (val) {
         print('Creating...');
         model.uid = val.documentID;
-
-        return true;
+        print(model.uid);
+        return val.documentID;
       },
     ).catchError(
       (e) {
         print('Rejecting...');
-        return false;
+        return null;
       },
     );
   }

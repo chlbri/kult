@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kult/data/datasources/firebase/choice.dart';
 import 'package:kult/data/datasources/firebase/services/auth.dart';
+import 'package:kult/data/datasources/firebase/services/database.dart';
 import 'package:kult/data/models/choice.dart';
 import 'package:kult/domain/entities/choice.dart';
 import 'package:kult/domain/entities/choice_list.dart';
@@ -53,15 +54,9 @@ class _HomeState extends State<FutureHome> {
     final uid = await FirebaseAuthService().currentUid;
     print("Home...");
     print(uid);
-    return registerContainer
-        .read(
-          await FirebaseAuthService().currentUid,
-        )
-        .then(
-          (value) async => await Future.delayed(
-            Duration(seconds: 1),
-          ),
-        );
+    return registerContainer.read(
+      await FirebaseAuthService().currentUid,
+    );
   }
 
   bool refreshOnce = true;
@@ -71,27 +66,21 @@ class _HomeState extends State<FutureHome> {
   Widget build(BuildContext context) {
     final out = refreshOnce
         ? FutureBuilder(
-            future: _futureFonction(),
-            builder: (ctx, snap) {
-              if (snap.connectionState == ConnectionState.done) {
-                if (snap.hasData) {
-                  print(snap.data);
-                  return SuccessHomeScreen(
-                    snap: snap,
-                  );
-                }return SuccessHomeScreen(
-                    snap: snap,
-                  );
-              } else {
-                return Scaffold(
-                  body: Center(
-                    child: Text('Pas de connexion Internet'),
-                  ),
+            future: _future,
+            builder: (ctx, AsyncSnapshot<Member> snap) {
+              print('snap.data');
+              print(snap.data);
+              if (snap.connectionState == ConnectionState.done &&
+                  snap.hasData) {
+                return SuccessHomeScreen(
+                  snap: snap,
                 );
               }
+              return Scaffold();
             },
           )
         : Scaffold();
+
     // refreshOnce = false;
     return out;
   }
@@ -293,10 +282,11 @@ class KultChoices extends StatelessWidget with ScreenRouting {
     @required this.snap,
   }) : super(key: key);
 
-  final AsyncSnapshot snap;
+  final AsyncSnapshot<Member> snap;
 
   @override
   Widget build(BuildContext context) {
+    final data = snap.data;
     return Column(
       children: [
         Row(
@@ -369,22 +359,18 @@ class KultChoices extends StatelessWidget with ScreenRouting {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   CheckboxGroup(
-                    groupChoice: snap?.data?.choice,
+                    groupChoice: snap.data?.choice,
                     direction: Axis.vertical,
-                    model: () => snap?.data,
+                    model: () => snap.data ?? Member(),
                     alert: true,
+                    enabledQuery: (e, [_]) async => chooseKultContainer.update(
+                      Choice()..choice = e,
+                      uid: await FirebaseAuthService().currentUid,
+                    ),
+                    disabledQuery: (e, [_]) async => chooseKultContainer
+                        .remove(await FirebaseAuthService().currentUid),
                   ),
-                  // ...ChoiceList.values
-                  //     .map(
-                  //       (e) => KultChoiceButton(
-                  //         uid: snap.data?.getUserUid,
-                  //         enabled: snap.data != null
-                  //             ? snap.data.groupChoice?.contains(e) == false
-                  //             : true,
-                  //         choice: e,
-                  //       ),
-                  //     )
-                  //     .toList()
+
                 ],
               ),
             ),

@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kult/core/utils.dart';
-import 'package:kult/data/datasources/firebase/choice.dart';
-import 'package:kult/data/datasources/firebase/member.dart';
-import 'package:kult/data/models/choice.dart';
-import 'package:kult/data/models/member.dart';
-import 'package:kult/data/repos/choice.dart';
-import 'package:kult/domain/entities/choice.dart';
 import 'package:kult/domain/entities/choice_list.dart';
 import 'package:kult/domain/entities/member.dart';
-import 'package:kult/domain/usecases/choose_kult.dart';
 import 'package:kult/ui/contrats/screen_routing.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -33,6 +25,9 @@ extension ChoiceListExtension on ChoiceList {
       case ChoiceList.DIMANCHE2:
         out = 'Dimanche 11h à 13h';
         break;
+      case ChoiceList.NONE:
+        // TODO: Handle this case.
+        break;
     }
     return out;
   }
@@ -52,34 +47,19 @@ extension ChoiceListExtension on ChoiceList {
       case ChoiceList.DIMANCHE2:
         out = 'qui se tiendra ce dimanche, de 11h à 13h';
         break;
+      case ChoiceList.NONE:
+        // TODO: Handle this case.
+        break;
     }
     return out;
   }
 }
 
-final alertStyle = AlertStyle(
-  animationType: AnimationType.fromTop,
-  isCloseButton: false,
-  isOverlayTapDismiss: false,
-  descStyle: const TextStyle(fontWeight: FontWeight.bold),
-  animationDuration: Duration(milliseconds: 400),
-  alertBorder: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(15.0),
-    side: BorderSide(
-      color: Colors.grey,
-    ),
-  ),
-  titleStyle: TextStyle(
-    color: Colors.brown[200],
-  ),
-);
-
-class CheckboxKult extends StatefulWidget with ScreenRouting {
+class CheckboxKult extends StatelessWidget with ScreenRouting {
   final IconData iconData;
   final ChoiceList choice;
   final EdgeInsetsGeometry margin;
-  final bool ableToRegister, enabled, alert;
-  final MemberModel model;
+  final bool enabled;
   final VoidCallback onPressed;
 
   const CheckboxKult({
@@ -88,115 +68,79 @@ class CheckboxKult extends StatefulWidget with ScreenRouting {
     this.margin,
     @required this.choice,
     this.enabled,
-    this.alert,
-    @required this.model,
-    this.ableToRegister,
     this.onPressed,
+
   }) : super(key: key);
 
-  @override
-  _CheckboxKultState createState() => _CheckboxKultState();
-}
 
-class _CheckboxKultState extends State<CheckboxKult> {
-  bool switcher = true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(CheckboxKult oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    switcher = widget.enabled;
-  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final alertMsg = StringBuffer();
 
-    alertMsg.write(
-        widget.model?.lastName ?? widget?.model?.firstNames ?? "Inconnu");
-    alertMsg.write(' ');
-    alertMsg.write(
-        switcher ? "sera convié au culte" : "ne participeras plus au culte");
-    alertMsg.write(' ');
-    alertMsg.write(widget.choice.msg);
-    alertMsg.write('.');
-    final alertWidget = Alert(
-      context: context,
-      style: alertStyle,
-      type: AlertType.info,
-      title: "Choix éffectué",
-      desc: alertMsg.toString(),
-      content: SizedBox(width: 10),
-      buttons: [
-        DialogButton(
-          child: Text(
-            "OK",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-          onPressed: () => Navigator.pop(context),
-          color: Color(0xFF0A8B9C),
-          radius: BorderRadius.circular(10.0),
-        ),
-      ],
-    );
     return Container(
-      margin: widget.margin ?? EdgeInsets.only(right: 10),
-      child: FlatButton(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10,
-        ),
-        splashColor: switcher ? Colors.white54 : Colors.black54,
-        color: switcher ? Colors.black87 : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        textColor: !switcher ? Colors.black87 : Colors.white,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Icon(
-              widget.iconData,
-              size: size.width * 0.035,
+        margin: margin ?? EdgeInsets.only(right: 10),
+        child: AnimatedCrossFade(
+          duration: Duration(milliseconds: 450),
+          crossFadeState: enabled
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+          firstChild: FlatButton(
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
             ),
-            SizedBox(width: 10),
-            Text(
-              widget.choice.text,
-              style: TextStyle(fontSize: size.width * 0.035),
-            )
-          ],
-        ),
-        onPressed: () async {
-          if (widget.enabled) {
-            if (widget.ableToRegister && widget.model != null) {
-              chooseKultContainer
-                  .update(
-                Choice()..choice = widget.choice,
-                uid: widget.model.uid,
-              )
-                  .then((val) {
-                if (widget.alert) alertWidget.show();
-                widget.onPressed();
-              });
-            }
-          } else {
-            if (widget.ableToRegister && widget.model != null) {
-              chooseKultContainer.remove(widget.model.uid).then(
-                (val) {
-                  if (widget.alert) alertWidget.show();
-                  widget.onPressed();
-                },
-              );
-            }
-          }
-        },
-      ),
-    );
+            splashColor: Colors.white54,
+            color: Colors.black87,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            textColor: Colors.white,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Icon(
+                  iconData,
+                  size: size.width * 0.035,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  choice.text,
+                  style: TextStyle(fontSize: size.width * 0.035),
+                )
+              ],
+            ),
+            onPressed: onPressed,
+          ),
+          secondChild: FlatButton(
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
+            ),
+            splashColor: Colors.black54,
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            textColor: Colors.black87,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Icon(
+                  iconData,
+                  size: size.width * 0.035,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  choice.text,
+                  style: TextStyle(fontSize: size.width * 0.035),
+                )
+              ],
+            ),
+            onPressed: onPressed ,
+          ),
+        ));
   }
 }

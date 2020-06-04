@@ -1,4 +1,5 @@
 import 'package:kult/core/utils.dart';
+import 'package:kult/domain/entities/choice_list.dart';
 import 'package:kult/domain/entities/member.dart';
 
 import '../contracts/model.dart';
@@ -6,16 +7,17 @@ import '../contracts/updates.dart';
 import '../contracts/update.dart';
 
 class MemberModel extends Member with Model, Updates<Member> {
-  MemberModel({
-    String id,
-    String login,
-    String mdp,
-    String firstNames,
-    String lastName,
-    String phoneNumber,
-    DateTime createdAt,
-    DateTime deletedAt,
-  }) /* : assert(
+  MemberModel(
+      {String uid,
+      String login,
+      String mdp,
+      String firstNames,
+      String lastName,
+      String phoneNumber,
+      DateTime createdAt,
+      DateTime deletedAt,
+      ChoiceList
+          choice}) /* : assert(
           !isNullAny([
             firstNames,
             lastName,
@@ -24,7 +26,7 @@ class MemberModel extends Member with Model, Updates<Member> {
           ]),
         ) */
   {
-    this.id = id;
+    this.uid = uid;
     this.createdAt = createdAt;
     this.deletedAt = deletedAt;
     this.login = login;
@@ -32,6 +34,7 @@ class MemberModel extends Member with Model, Updates<Member> {
     this.firstNames = firstNames;
     this.lastName = lastName;
     this.phoneNumber = phoneNumber;
+    this.choice = choice;
   }
 
   MemberModel.fromEntity(Member data)
@@ -40,14 +43,17 @@ class MemberModel extends Member with Model, Updates<Member> {
           lastName: data.lastName,
           login: data.login,
           phoneNumber: data.phoneNumber,
+          choice: data.choice,
+          uid: data.uid,
         );
 
   static bool validateJson(dynamic json) {
     return checkTypes([
       TypeChecker2(DateTime, json["createdAt"]),
-      TypeChecker2(String, json["id"]),
+      TypeChecker2(String, json["uid"]),
       TypeChecker2(String, json["login"]),
       TypeChecker2(String, json["mdp"]),
+      TypeChecker2(String, json["choice"]),
       TypeChecker2(int, json["phoneNumber"]),
       TypeChecker2(String, json["firstNames"]),
       TypeChecker2(String, json["lastName"]),
@@ -60,17 +66,20 @@ class MemberModel extends Member with Model, Updates<Member> {
     bool withUpdates = false,
   ]) {
     // if (!validateJson(json)) return null;
-    print('fromJson...');
-    print(json);
-    final out = MemberModel(
-      createdAt: json["createdAt"],
-      id: json["id"],
+    return MemberModel(
       login: json["login"],
-      mdp: json["mdp"],
       phoneNumber: json["phoneNumber"],
       firstNames: json["firstNames"],
       lastName: json["lastName"],
-      deletedAt: json["deletedAt"],
+      choice: (json['choice'] as int) == null
+          ? null
+          : ChoiceList.values[json['choice'] as int],
+    );
+    final out = MemberModel(
+      login: json["login"],
+      phoneNumber: json["phoneNumber"],
+      firstNames: json["firstNames"],
+      lastName: json["lastName"],
     );
     if (!withUpdates) return out;
     final updates = json['updates'];
@@ -92,8 +101,9 @@ class MemberModel extends Member with Model, Updates<Member> {
   Map<String, dynamic> toJson([bool withUpdates = false]) {
     final out = <String, dynamic>{};
     out.put('createdAt', createdAt ??= DateTime.now());
-    out.put('uid', id);
+    out.put('uid', uid);
     out.put('login', login);
+    out.put('choice', choice.index);
     out.put('phoneNumber', phoneNumber);
     out.put('firstNames', firstNames);
     out.put('lastName', lastName);

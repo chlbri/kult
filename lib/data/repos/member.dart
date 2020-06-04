@@ -11,12 +11,14 @@ class RepoMember extends IRepoMember {
     this.source,
   });
 
-  Future<bool> create(data) {
+  Future<String> create(data) {
     final model = MemberModel.fromEntity(data);
     return source.create(model);
   }
 
-  read(uid) => source.read(uid);
+  read(uid) {
+    return source.read(uid);
+  }
 
   Future update(data) {
     final model = MemberModel.fromEntity(data);

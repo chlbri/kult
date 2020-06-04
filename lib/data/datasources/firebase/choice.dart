@@ -28,7 +28,7 @@ class FireStoreChoiceSource extends FireStoreService<ChoiceModel> {
   }
 
   Future<bool> update(ChoiceModel data,{String uid}) async {
-    final innerUid = data.uid ?? await getUserUid;
+    final innerUid = data.uid;
     if (isNull(innerUid)) {
       print("Cannot create");
       return false;
@@ -48,9 +48,9 @@ class FireStoreChoiceSource extends FireStoreService<ChoiceModel> {
   Future<bool> delete(String uid) async {
     return collection
         .document(
-          uid ?? await getUserUid,
+          uid ,
         )
-        .setData({'choice': FieldValue.delete()})
+        .updateData({'choice': FieldValue.delete()})
         .then((_) => true)
         .catchError((_) => false);
   }

@@ -7,7 +7,11 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:kult/data/datasources/firebase/member.dart';
 import 'package:kult/core/utils.dart';
 import 'package:kult/data/models/member.dart';
+import 'package:kult/domain/entities/choice.dart';
 import 'package:kult/domain/entities/choice_list.dart';
+import 'package:kult/domain/entities/member.dart';
+import 'package:kult/domain/usecases/choose_kult.dart';
+import 'package:kult/domain/usecases/register.dart';
 import 'package:kult/ui/android/router/router.gr.dart';
 import 'package:kult/ui/android/widgets/checkbox_group.dart';
 import 'package:kult/ui/android/widgets/column_form.dart';
@@ -49,12 +53,22 @@ class RegisterMany extends StatefulWidget with ScreenRouting {
 }
 
 class _RegisterManyState extends State<RegisterMany> {
+  bool firstEnter = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    firstEnter = true;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('obtainning...');
     final MemberModel member = MemberModel();
+    print(member.uid);
     final _formKey = GlobalKey<FormState>();
     final _scaffoldKey = GlobalKey<ScaffoldState>();
-    bool ableToValidate = false;
     return InputScreen(
       scaffoldKey: _scaffoldKey,
       background: BoxDecoration(
@@ -182,21 +196,18 @@ class _RegisterManyState extends State<RegisterMany> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   CheckboxGroup(
-                    ableToRegister: () => _formKey.currentState.validate(),
+                    ableToRegister: () => _formKey.currentState?.validate(),
                     direction: Axis.vertical,
                     model: () => member,
                     alert: true,
+                    enabledQuery: (e, [model]) {
+                      return createOtherUser(member, model, e);
+                    },
+                    disabledQuery: (e, [model]) {
+                      print(member.uid);
+                      return chooseKultContainer.remove(model().uid);
+                    },
                   ),
-                  // ...ChoiceList.values
-                  //     .map(
-                  //       (e) => KultChoiceButtonOther(
-                  //           ableToRegister: () {
-                  //             return _formKey.currentState.validate();
-                  //           },
-                  //           choice: e,
-                  //           model: member),
-                  //     )
-                  //     .toList(),
                 ],
               ),
             ),
@@ -254,31 +265,16 @@ class _RegisterManyState extends State<RegisterMany> {
       stackedFields: <Widget>[],
     );
   }
-}
 
-class RoundButton extends StatelessWidget {
-  const RoundButton({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipOval(
-      child: Material(
-        color: Color(0xFFBA7D40), // button color
-        child: InkWell(
-          splashColor: Colors.white60, // inkwell color
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Icon(
-              Icons.person_add,
-              color: Colors.white,
-              size: 50,
-            ),
-          ),
-          onTap: () {},
-        ),
-      ),
-    );
+  Future createOtherUser(MemberModel member, Member model(), ChoiceList e) {
+    if (member.uid == null) {
+      return registerContainer
+          .create(
+            model()..choice = e,
+          )
+          .then((value) => member.uid = value);
+    } else {
+      return chooseKultContainer.update(Choice()..choice = e, uid: member.uid);
+    }
   }
 }

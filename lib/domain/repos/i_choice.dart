@@ -6,5 +6,5 @@ import '../contract/repo.dart';
 abstract class IRepoChoice extends Repo{
   Future update(Choice data,{String uid});
   Future<Choice> read(String uid);
-  Future delete(String uid);
+  Future<bool> delete(String uid);
 }

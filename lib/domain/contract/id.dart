@@ -1,5 +1,5 @@
 
 mixin Id{
-  String id;
+  String uid;
 } 
 

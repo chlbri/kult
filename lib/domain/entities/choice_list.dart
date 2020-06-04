@@ -3,6 +3,7 @@ enum ChoiceList {
   SAMEDI2,
   DIMANCHE1,
   DIMANCHE2,
+  NONE
 }
 
 final c = ChoiceList.values[0];
