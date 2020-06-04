@@ -11,7 +11,7 @@ class RepoMember extends IRepoMember {
     this.source,
   });
 
-  Future<String> create(data) {
+  create(data) {
     final model = MemberModel.fromEntity(data);
     return source.create(model);
   }
@@ -30,5 +30,10 @@ class RepoMember extends IRepoMember {
   Future delete(String uid) {
     // TODO: implement create
     throw UnimplementedError();
+  }
+
+  @override
+  readMany(data) {
+    return source.readMany(data);
   }
 }

@@ -10,19 +10,23 @@ class Register extends UseCase {
 
   Register(this.repoMember);
 
-  Future<String>create(Member member) {
+  Future<String> create(Member member) {
     if (isNullList([
       member.firstNames,
       member.lastName,
     ])) return null;
-    return repoMember.create(member) ;
+    return repoMember.create(member);
   }
 
-  Future<Member> read(String uid){
+  Future<Member> read(String uid) {
     return repoMember.read(uid);
   }
-}
 
+  Future<List<Member>> readMany(Member data) {
+    return repoMember.readMany(data);
+    // return repoMember.read(uid);
+  }
+}
 
 final registerContainer = Register(
   RepoMember(

@@ -1,5 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart' show FirebaseUser;
-import 'package:kult/data/datasources/firebase/choice.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kult/data/datasources/firebase/services/auth.dart';
 import 'package:kult/data/datasources/firebase/services/database.dart';
 import 'package:kult/data/models/member.dart';
@@ -29,6 +28,25 @@ class FirestoreMemberSource extends FireStoreService<MemberModel> {
     return MemberModel.fromJson(
       snap.data..['uid'] = uid,
     );
+  }
+
+  Future<List<Member>> readMany(MemberModel data) async {
+    Query query = collection.where('createdAt');
+    final _data = data.toJson();
+    _data.removeWhere(
+      (key, value) =>
+          key == 'uid' || value == null || value is String && value.isEmpty,
+    );
+    _data.forEach((key, value) {
+      query = query.where(key, isEqualTo: value);
+    });
+    return await query.getDocuments().then(
+          (value) => value.documents
+              .map(
+                (e) => MemberModel.fromJson(e.data)
+              )
+              .toList(),
+        );
   }
 
   Future<String> create(MemberModel model) async {
