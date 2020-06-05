@@ -81,6 +81,8 @@ bool checkTypes(List<Checker> toCheck) {
 bool isNull(arg) => arg == null;
 bool isNullString(String arg) => arg == null || arg.isEmpty;
 
+bool isTrue(bool arg) => arg == null || arg;
+
 bool isNullList(List args) => args.every(isNull);
 bool isNullAny(List args) => args.any(isNull);
 

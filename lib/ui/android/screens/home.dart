@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kult/core/utils.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
 import 'package:kult/data/datasources/firebase/choice.dart';
 import 'package:kult/data/datasources/firebase/services/auth.dart';
 import 'package:kult/data/datasources/firebase/services/database.dart';
@@ -15,10 +18,10 @@ import 'package:kult/domain/usecases/register.dart';
 import 'package:kult/ui/android/router/router.gr.dart';
 import 'package:kult/ui/android/widgets/carousel_card.dart';
 import 'package:kult/ui/android/widgets/checkbox_group.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-import '../widgets/screen_background.dart';
-import '../../contrats/screen_routing.dart';
+
 import '../../contrats/screen.dart';
+import '../../contrats/screen_routing.dart';
+import '../widgets/screen_background.dart';
 
 final alertStyle = AlertStyle(
   animationType: AnimationType.fromTop,
@@ -39,6 +42,13 @@ final alertStyle = AlertStyle(
 );
 
 class Home extends Screen {
+  final Member data;
+
+  Home({
+    Key key,
+    this.data,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) => FutureHome();
 }
@@ -53,7 +63,7 @@ class _HomeState extends State<FutureHome> {
     final uid = await FirebaseAuthService().currentUid;
     print("Home...");
     print(uid);
-    final out =  await registerContainer.read(
+    final out = await registerContainer.read(
       uid,
     );
     return out;
@@ -392,11 +402,9 @@ class KultChoices extends StatelessWidget with ScreenRouting {
           textColor: Colors.white,
           onPressed: () {
             final data = snap.data;
-            if (data != null) {
-              snap.data.isAdmin
-                  ? pushNamed(Routes.list)
-                  : pushNamed(Routes.register);
-            }
+            isTrue(data?.isAdmin)
+                ? pushNamed(Routes.list)
+                : pushNamed(Routes.register);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
