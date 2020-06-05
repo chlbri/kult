@@ -10,17 +10,12 @@ import '../contract/timestamps.dart';
 import '../contract/admin.dart';
 
 class Member extends Entity
-    with Id, Credentials, Human, Timestamps, Admin
-    implements Equatable {
+    with Id, Credentials, Human, Timestamps, Admin, EquatableMixin {
   String phoneNumber;
   ChoiceList choice;
 
   @override
   get props => [firstNames, lastName, login, phoneNumber, choice];
-
-  @override
-  get stringify => false;
-
 
   // Mapget fields => {
   //       'uid': uid,
