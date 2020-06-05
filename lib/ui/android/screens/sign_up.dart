@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:kult/core/utils.dart';
 import 'package:kult/data/datasources/firebase/member.dart';
 import 'package:kult/data/models/member.dart';
 import 'package:kult/domain/entities/member.dart';
+import 'package:kult/domain/usecases/register.dart';
+import 'package:kult/domain/usecases/sign_up.dart';
 import 'package:kult/ui/android/router/router.gr.dart';
 import 'package:kult/ui/android/widgets/column_form.dart';
 
@@ -20,7 +23,7 @@ class SignUp extends Screen with ScreenRouting {
   const SignUp({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final MemberModel member = MemberModel();
+    final Member member = MemberModel();
     final _formKey = GlobalKey<FormState>();
     final _scaffoldKey = GlobalKey<ScaffoldState>();
     return InputScreen(
@@ -131,11 +134,11 @@ class SignUp extends Screen with ScreenRouting {
   }
 
   _signUp(
-    MemberModel member,
+    Member member,
     GlobalKey<FormState> _formKey,
     GlobalKey<ScaffoldState> _scaffoldState,
   ) {
-    return () {
+    return () async {
       if (_formKey.currentState.validate()) {
         _scaffoldState.currentState.showSnackBar(
           SnackBar(
@@ -143,10 +146,14 @@ class SignUp extends Screen with ScreenRouting {
             duration: Duration(milliseconds: 200),
           ),
         );
-        "chlbri.blac@gmail.com";
         //member.login = member.lastName;
-        FirestoreMemberSource(member).signUp();
-        pushReplacementNamed(Routes.home);
+        await signUpFireBaseAuthContainer(member).then((value) => member.uid = value);
+
+        if (!isNullString(member.uid)) {
+          registerContainer
+              .update(member)
+              .then((value) => pushReplacementNamed(Routes.home));
+        }
       }
     };
   }

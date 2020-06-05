@@ -1,10 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kult/ui/contrats/screen.dart';
 
 import '../android/router/router.gr.dart';
 
-mixin ScreenRouting on Widget {
+mixin ScreenRouting on Diagnosticable {
   Future pushNamed(
     String route, {
     Object arguments,

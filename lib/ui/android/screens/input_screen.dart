@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../widgets/screen_background.dart';
+
 import '../../contrats/screen.dart';
+import '../widgets/screen_background.dart';
 
 ///
 class InputScreen extends Screen {
@@ -10,6 +11,8 @@ class InputScreen extends Screen {
   ///L'arrière-plan
   final Decoration background;
 
+  final EdgeInsetsGeometry padding;
+
   ///Il est préférable d'utiliser [Positioned] ici
   final List<Widget> stackedFields;
 
@@ -17,10 +20,11 @@ class InputScreen extends Screen {
   final GlobalKey<ScaffoldState> scaffoldKey;
 
   const InputScreen({
-    this.scaffoldKey,
     @required this.children,
-    this.stackedFields,
     this.background,
+    this.padding,
+    this.stackedFields,
+    this.scaffoldKey,
   });
 
   @override
@@ -42,13 +46,14 @@ class InputScreen extends Screen {
                   ),
               child: SingleChildScrollView(
                   child: Container(
-                    margin: EdgeInsets.symmetric(
-                      vertical: 50,
-                    ),
-                    child: Column(
-                      children: children,
-                    ),
-                  )),
+                padding: padding ?? EdgeInsets.symmetric(horizontal: 10),
+                margin: EdgeInsets.symmetric(
+                  vertical: 50,
+                ),
+                child: Column(
+                  children: children,
+                ),
+              )),
             ),
           ),
           ...stackedFields,

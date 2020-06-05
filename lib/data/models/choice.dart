@@ -56,7 +56,6 @@ class ChoiceModel extends Choice with Model, Updates<Choice> {
   @override
   Map<String, dynamic> toJson([bool withUpdates = false]) {
     final out = <String, dynamic>{};
-    out.put('id', uid);
     out.put('choice', choice.index);
     print(out);
     if (!withUpdates) return out;

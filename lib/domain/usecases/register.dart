@@ -10,12 +10,19 @@ class Register extends UseCase {
 
   Register(this.repoMember);
 
-  Future<String> create(Member member) {
+  Future<String> create(Member member) async {
     if (isNullList([
       member.firstNames,
       member.lastName,
     ])) return null;
-    return repoMember.create(member);
+    return await repoMember.create(member);
+  }
+  Future<String> update(Member member) async {
+    if (isNullList([
+      member.firstNames,
+      member.lastName,
+    ])) return null;
+    return await repoMember.update(member);
   }
 
   Future<Member> read(String uid) {
@@ -23,7 +30,20 @@ class Register extends UseCase {
   }
 
   Future<List<Member>> readMany(Member data) {
-    return repoMember.readMany(data);
+    return repoMember.readAll(data);
+    // return repoMember.read(uid);
+  }
+
+  Future<ResultMemberMany> readMore(
+    Member data, {
+    int limit,
+    String uid,
+  }) {
+    return repoMember.readMore(
+      data,
+      limit: limit,
+      uid: uid,
+    );
     // return repoMember.read(uid);
   }
 }

@@ -16,7 +16,6 @@ import 'package:kult/ui/android/router/router.gr.dart';
 import 'package:kult/ui/android/widgets/carousel_card.dart';
 import 'package:kult/ui/android/widgets/checkbox_group.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import '../widgets/kult_choice_button.dart';
 import '../widgets/screen_background.dart';
 import '../../contrats/screen_routing.dart';
 import '../../contrats/screen.dart';
@@ -54,9 +53,10 @@ class _HomeState extends State<FutureHome> {
     final uid = await FirebaseAuthService().currentUid;
     print("Home...");
     print(uid);
-    return registerContainer.read(
-      await FirebaseAuthService().currentUid,
+    final out =  await registerContainer.read(
+      uid,
     );
+    return out;
   }
 
   bool refreshOnce = true;
@@ -76,7 +76,9 @@ class _HomeState extends State<FutureHome> {
                   snap: snap,
                 );
               }
-              return Scaffold();
+              return Scaffold(
+                body: Center(child: Text('No data')),
+              );
             },
           )
         : Scaffold();
@@ -370,7 +372,6 @@ class KultChoices extends StatelessWidget with ScreenRouting {
                     disabledQuery: (e, [_]) async => chooseKultContainer
                         .remove(await FirebaseAuthService().currentUid),
                   ),
-
                 ],
               ),
             ),
@@ -378,6 +379,7 @@ class KultChoices extends StatelessWidget with ScreenRouting {
         ),
         SizedBox(height: 20),
         RaisedButton(
+          elevation: 1000,
           // padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
@@ -389,7 +391,12 @@ class KultChoices extends StatelessWidget with ScreenRouting {
           splashColor: Colors.black45,
           textColor: Colors.white,
           onPressed: () {
-            pushNamed(Routes.register);
+            final data = snap.data;
+            if (data != null) {
+              snap.data.isAdmin
+                  ? pushNamed(Routes.list)
+                  : pushNamed(Routes.register);
+            }
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

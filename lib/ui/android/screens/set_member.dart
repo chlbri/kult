@@ -44,14 +44,29 @@ final alertStyle = AlertStyle(
   ),
 );
 
-class RegisterMany extends StatefulWidget with ScreenRouting {
-  const RegisterMany({Key key}) : super(key: key);
+class SetMember extends StatelessWidget {
+  final Member data;
+
+  const SetMember({Key key, this.data}) : super(key: key);
 
   @override
-  _RegisterManyState createState() => _RegisterManyState();
+  Widget build(BuildContext context) {
+    return Container(
+      child: _SetMember(data: data),
+    );
+  }
 }
 
-class _RegisterManyState extends State<RegisterMany> {
+class _SetMember extends StatefulWidget {
+  final Member data;
+
+  const _SetMember({Key key, this.data}) : super(key: key);
+
+  @override
+  _SetMemberState createState() => _SetMemberState();
+}
+
+class _SetMemberState extends State<_SetMember> with ScreenRouting {
   bool firstEnter = true;
 
   @override
@@ -64,9 +79,12 @@ class _RegisterManyState extends State<RegisterMany> {
   @override
   Widget build(BuildContext context) {
     print('obtainning...');
-    final MemberModel member = MemberModel();
+    const style = TextStyle(
+      color: Colors.white,
+      fontSize: 20,
+    );
+    final Member member = widget.data ?? Member();
     print(member.uid);
-    final _formKey = GlobalKey<FormState>();
     final _scaffoldKey = GlobalKey<ScaffoldState>();
     return InputScreen(
       scaffoldKey: _scaffoldKey,
@@ -80,16 +98,6 @@ class _RegisterManyState extends State<RegisterMany> {
         Padding(
           padding: const EdgeInsets.all(20.0),
           child: Image.asset('assets/img/header_txt.png', height: 30),
-        ),
-        SizedBox(height: 10),
-        Text(
-          'Inscrire une autre personne',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 40,
-          ),
-          strutStyle: StrutStyle(),
         ),
         SizedBox(height: 20),
         Row(
@@ -148,38 +156,33 @@ class _RegisterManyState extends State<RegisterMany> {
         ),
         Padding(
           padding: const EdgeInsets.all(15),
-          child: ColumnForm(
-            formKey: _formKey,
-            children: [
-              SizedBox(height: 10),
-              SignFormField(
-                label: 'Nom',
-                onChanged: (val) => member.lastName = val,
-                validator: RequiredValidator(errorText: "Champ requis"),
-              ),
-              SizedBox(height: 30),
-              SignFormField(
-                label: 'Prénoms',
-                onChanged: (val) => member.firstNames = val,
-                validator: RequiredValidator(errorText: "Champ requis"),
-              ),
-              SizedBox(height: 30),
-              SignFormField(
-                label: 'Téléphone',
-                keyboard: TextInputType.phone,
-                onChanged: (val) {
-                  member.phoneNumber = val;
-                },
-                validator: MultiValidator([
-                  PatternValidator("[012345678][0-9]{7}",
-                      errorText: 'Numéro invalide'),
-                  RequiredValidator(errorText: "Champ requis"),
-                ]),
-              ),
+          child: Column(
+            children: <Widget>[
+              if (member.lastName != null) ...[
+                Text(
+                  member.lastName ?? 'Nom inconnu',
+                  style: style,
+                ),
+                SizedBox(height: 10),
+              ],
+              if (member.firstNames != null) ...[
+                Text(
+                  member.firstNames ?? 'Prénoms inconnus',
+                  style: style,
+                ),
+                SizedBox(height: 10),
+              ],
+              if (member.phoneNumber != null) ...[
+                Text(
+                  member.phoneNumber ?? 'Numéro inconnu',
+                  style: style,
+                ),
+                SizedBox(height: 10),
+              ],
             ],
           ),
         ),
-        SizedBox(height: 40),
+        SizedBox(height: 10),
         Row(
           children: <Widget>[
             Expanded(
@@ -195,12 +198,13 @@ class _RegisterManyState extends State<RegisterMany> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   CheckboxGroup(
-                    ableToRegister: () => _formKey.currentState?.validate(),
+                    groupChoice: member.choice,
                     direction: Axis.vertical,
                     model: () => member,
                     alert: true,
                     enabledQuery: (e, [model]) {
-                      return createOtherUser(member, model, e);
+                      return chooseKultContainer.update(Choice()..choice = e,
+                          uid: model().uid);
                     },
                     disabledQuery: (e, [model]) {
                       print(member.uid);
@@ -213,46 +217,32 @@ class _RegisterManyState extends State<RegisterMany> {
           ],
         ),
         SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            RaisedButton(
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.person_add,
-                    size: 20,
-                  ),
-                  SizedBox(width: 20),
-                  Text(
-                    'Continuer',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
+        Padding(
+          padding: const EdgeInsets.only(right: 18.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              RaisedButton(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.exit_to_app,
+                      size: 20,
+                    ),
+                    SizedBox(width: 20),
+                    Text(
+                      "Retour",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+                onPressed: () {
+                  pop();
+                },
               ),
-              onPressed: () {
-                setState(() => null);
-              },
-            ),
-            RaisedButton(
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.exit_to_app,
-                    size: 20,
-                  ),
-                  SizedBox(width: 20),
-                  Text(
-                    "J'ai fini !",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-              onPressed: () {
-                widget.pop();
-              },
-            ),
-          ],
+            ],
+          ),
         ),
         Container(
           margin: EdgeInsets.only(top: 10),
@@ -263,17 +253,5 @@ class _RegisterManyState extends State<RegisterMany> {
       ],
       stackedFields: <Widget>[],
     );
-  }
-
-  Future createOtherUser(MemberModel member, Member model(), ChoiceList e) {
-    if (member.uid == null) {
-      return registerContainer
-          .create(
-            model()..choice = e,
-          )
-          .then((value) => member.uid = value);
-    } else {
-      return chooseKultContainer.update(Choice()..choice = e, uid: member.uid);
-    }
   }
 }

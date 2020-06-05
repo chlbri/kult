@@ -20,20 +20,41 @@ class RepoMember extends IRepoMember {
     return source.read(uid);
   }
 
-  Future update(data) {
-    final model = MemberModel.fromEntity(data);
+  // Future update(data) {
+  //   final model = MemberModel.fromEntity(data);
 
-    // TODO: implement create
-    throw UnimplementedError();
-  }
+  //   // TODO: implement create
+  //   throw UnimplementedError();
+  // }
 
-  Future delete(String uid) {
-    // TODO: implement create
-    throw UnimplementedError();
+  // Future delete(String uid) {
+  //   // TODO: implement create
+  //   throw UnimplementedError();
+  // }
+
+  @override
+  readAll(data) {
+    final _data = MemberModel.fromEntity(data);
+    return source.readAll(_data);
   }
 
   @override
-  readMany(data) {
-    return source.readMany(data);
+  readMore(
+    data, {
+    limit,
+    uid,
+  }) {
+    final _data = MemberModel.fromEntity(data);
+    return source.readMore(
+      _data,
+      limit: limit,
+      uid: uid,
+    );
+  }
+
+  @override
+  update(data) {
+    final _data = MemberModel.fromEntity(data);
+    return source.update(_data);
   }
 }

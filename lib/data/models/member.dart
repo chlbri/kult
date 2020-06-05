@@ -7,17 +7,18 @@ import '../contracts/updates.dart';
 import '../contracts/update.dart';
 
 class MemberModel extends Member with Model, Updates<Member> {
-  MemberModel(
-      {String uid,
-      String login,
-      String mdp,
-      String firstNames,
-      String lastName,
-      String phoneNumber,
-      DateTime createdAt,
-      DateTime deletedAt,
-      ChoiceList
-          choice}) /* : assert(
+  MemberModel({
+    String uid,
+    String login,
+    String mdp,
+    String firstNames,
+    String lastName,
+    String phoneNumber,
+    DateTime createdAt,
+    DateTime deletedAt,
+    bool isAdmin,
+    ChoiceList choice,
+  }) /* : assert(
           !isNullAny([
             firstNames,
             lastName,
@@ -35,6 +36,7 @@ class MemberModel extends Member with Model, Updates<Member> {
     this.lastName = lastName;
     this.phoneNumber = phoneNumber;
     this.choice = choice;
+    this.isAdmin = isAdmin;
   }
 
   MemberModel.fromEntity(Member data)
@@ -45,6 +47,7 @@ class MemberModel extends Member with Model, Updates<Member> {
           phoneNumber: data.phoneNumber,
           choice: data.choice,
           uid: data.uid,
+          isAdmin: data.isAdmin,
         );
 
   static bool validateJson(dynamic json) {
@@ -65,21 +68,19 @@ class MemberModel extends Member with Model, Updates<Member> {
     Map<String, dynamic> json, [
     bool withUpdates = false,
   ]) {
+    if (json == null) return null;
     // if (!validateJson(json)) return null;
-    return MemberModel(
+
+    final out = MemberModel(
+      uid: json['uid'],
       login: json["login"],
       phoneNumber: json["phoneNumber"],
       firstNames: json["firstNames"],
       lastName: json["lastName"],
+      isAdmin: json['isAdmin'],
       choice: (json['choice'] as int) == null
           ? null
           : ChoiceList.values[json['choice'] as int],
-    );
-    final out = MemberModel(
-      login: json["login"],
-      phoneNumber: json["phoneNumber"],
-      firstNames: json["firstNames"],
-      lastName: json["lastName"],
     );
     if (!withUpdates) return out;
     final updates = json['updates'];
@@ -102,12 +103,12 @@ class MemberModel extends Member with Model, Updates<Member> {
     final out = <String, dynamic>{};
     out.put('createdAt', createdAt ??= DateTime.now());
     out.put('uid', uid);
+    out.put('isAdmin', isAdmin);
     out.put('login', login);
-    out.put('choice', choice.index);
+    out.put('choice', choice?.index);
     out.put('phoneNumber', phoneNumber);
     out.put('firstNames', firstNames);
     out.put('lastName', lastName);
-    out.put('createdAt', createdAt);
     if (!withUpdates) return out;
     return out;
   }

@@ -70,7 +70,7 @@ class FirebaseAuthService {
   }
 
   ///S'inscrire avec email et mot de passe
-  Future signUpWithEmailAndPassword(
+  Future<String> signUpWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -79,10 +79,10 @@ class FirebaseAuthService {
           email: email,
           password: password,
         )
-        .then((val) => val.user)
+        .then((val) => val.user.uid)
         .catchError((error) {
       print(error.toString());
-      return false;
+      return null;
     });
   }
 

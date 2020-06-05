@@ -28,7 +28,7 @@ class FireStoreChoiceSource extends FireStoreService<ChoiceModel> {
   }
 
   Future<bool> update(ChoiceModel data,{String uid}) async {
-    final innerUid = data.uid;
+    final innerUid = data.uid ?? uid;
     if (isNull(innerUid)) {
       print("Cannot create");
       return false;

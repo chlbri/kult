@@ -1,3 +1,4 @@
+import 'package:kult/core/utils.dart';
 import 'package:kult/data/datasources/firebase/choice.dart';
 import 'package:kult/data/repos/choice.dart';
 import 'package:kult/domain/entities/choice.dart';
@@ -10,14 +11,18 @@ class ChooseKult {
   });
 
   Future update(Choice data, {String uid}) {
-    return repoChoice.update(data, uid: uid);
+    final out = isNullStringEvery([data.uid, uid])
+        ? null
+        : repoChoice.update(data, uid: uid);
+    return out;
   }
 
   Future<bool> remove(String uid) {
-    return repoChoice.delete(uid);
+    return isNullString(uid) ? null : repoChoice.delete(uid);
   }
+
   Future<Choice> read(String uid) {
-    return repoChoice.read(uid);
+    return isNullString(uid) ? null : repoChoice.read(uid);
   }
 }
 

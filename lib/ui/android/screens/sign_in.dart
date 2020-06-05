@@ -7,6 +7,7 @@ import 'package:kult/data/datasources/firebase/services/auth.dart';
 import 'package:kult/data/models/choice.dart';
 import 'package:kult/data/models/member.dart';
 import 'package:kult/domain/entities/member.dart';
+import 'package:kult/domain/usecases/sign_in.dart';
 import '../router/router.gr.dart';
 import '../widgets/column_form.dart';
 import 'input_screen.dart';
@@ -19,7 +20,7 @@ class SignIn extends Screen with ScreenRouting {
   const SignIn({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final model = MemberModel();
+    final model = Member();
     final _formKey = GlobalKey<FormState>();
     final _scaffoldState = GlobalKey<ScaffoldState>();
 
@@ -47,7 +48,7 @@ class SignIn extends Screen with ScreenRouting {
           formKey: _formKey,
           children: [
             SignFormField(
-              label: 'Email / Tél',
+              label: 'Email',
               onChanged: (value) => model.login = value.trim(),
               validator: RequiredValidator(errorText: "Champ requis"),
             ),
@@ -60,6 +61,21 @@ class SignIn extends Screen with ScreenRouting {
               keyboard: TextInputType.visiblePassword,
             ),
           ],
+        ),
+        SizedBox(height: 50),
+        Material(
+          elevation: 100,
+          color: Colors.transparent,
+          child: InkWell(
+            child: Text(
+              'Mode passe oublié ?',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            ),
+            onTap: () {},
+          ),
         ),
       ],
       stackedFields: <Widget>[
@@ -89,7 +105,7 @@ class SignIn extends Screen with ScreenRouting {
   }
 
   _signIn(
-    MemberModel model,
+    Member model,
     GlobalKey<FormState> _formKey,
     GlobalKey<ScaffoldState> _scaffoldState,
   ) async {
@@ -101,8 +117,7 @@ class SignIn extends Screen with ScreenRouting {
           duration: Duration(seconds: 1),
         ),
       );
-      if (await FirestoreMemberSource(model).signIn()) {
-        
+      if (await signInFireBaseAuthContainer(model)) {
         pushNamedAndRemoveUntil(Routes.home, (route) => false);
       }
     }

@@ -1,6 +1,6 @@
 import 'package:kult/domain/entities/member.dart';
 
 abstract class IAuth {
-  Future signUp(Member data);
-  Future signIn(Member data);
+  Future<String> signUp(Member data);
+  Future<bool> signIn(Member data);
 }

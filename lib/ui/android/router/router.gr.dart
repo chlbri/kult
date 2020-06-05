@@ -7,11 +7,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:auto_route/auto_route.dart';
-import '../screens/initial.dart';
+import 'package:kult/ui/android/screens/initial.dart';
 import 'package:kult/ui/android/screens/sign_up.dart';
 import 'package:kult/ui/android/screens/sign_in.dart';
 import 'package:kult/ui/android/screens/home.dart';
 import 'package:kult/ui/android/screens/register_many.dart';
+import 'package:kult/ui/android/screens/list_known.dart';
+import 'package:kult/ui/android/screens/set_member.dart';
+import 'package:kult/domain/entities/member.dart';
 
 abstract class Routes {
   static const i = '/';
@@ -19,12 +22,16 @@ abstract class Routes {
   static const signIn = '/sign-in';
   static const home = '/home';
   static const register = '/register';
+  static const list = '/list';
+  static const setMember = '/set-member';
   static const all = {
     i,
     signUp,
     signIn,
     home,
     register,
+    list,
+    setMember,
   };
 }
 
@@ -78,6 +85,25 @@ class Router extends RouterBase {
           builder: (context) => RegisterMany(key: typedArgs.key),
           settings: settings,
         );
+      case Routes.list:
+        if (hasInvalidArgs<ListKnownArguments>(args)) {
+          return misTypedArgsRoute<ListKnownArguments>(args);
+        }
+        final typedArgs = args as ListKnownArguments ?? ListKnownArguments();
+        return MaterialPageRoute<dynamic>(
+          builder: (context) => ListKnown(key: typedArgs.key),
+          settings: settings,
+        );
+      case Routes.setMember:
+        if (hasInvalidArgs<SetMemberArguments>(args)) {
+          return misTypedArgsRoute<SetMemberArguments>(args);
+        }
+        final typedArgs = args as SetMemberArguments ?? SetMemberArguments();
+        return MaterialPageRoute<dynamic>(
+          builder: (context) =>
+              SetMember(key: typedArgs.key, data: typedArgs.data),
+          settings: settings,
+        );
       default:
         return unknownRoutePage(settings.name);
     }
@@ -104,4 +130,17 @@ class SignInArguments {
 class RegisterManyArguments {
   final Key key;
   RegisterManyArguments({this.key});
+}
+
+//ListKnown arguments holder class
+class ListKnownArguments {
+  final Key key;
+  ListKnownArguments({this.key});
+}
+
+//SetMember arguments holder class
+class SetMemberArguments {
+  final Key key;
+  final Member data;
+  SetMemberArguments({this.key, this.data});
 }

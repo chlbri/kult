@@ -7,10 +7,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kult/domain/entities/member.dart';
+import 'package:kult/domain/usecases/register.dart';
 
 import 'package:kult/main.dart';
 
 void main() {
+  test('Test ReadsMany', () {
+    registerContainer.readMany(Member()).then(expectAsync1((val) {
+      
+    }));
+  });
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyApp());
