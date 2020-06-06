@@ -27,6 +27,7 @@ const LIMIT = 25;
 
 class _ChildState extends State<_Child> with ScreenRouting {
   Member _filter = Member();
+  Member retrieve;
   String _lastUid;
   final _all = <Member>[],
       _datas = <Member>[],
@@ -133,12 +134,13 @@ class _ChildState extends State<_Child> with ScreenRouting {
   }
 
   Future<Null> _fetchAll(Member filter) async {
-    final getDatas = (await registerContainer.readMany(
+    final getDatas = (await registerContainer.readAll(
       filter,
     ))
         .where(
-      (el) => !isNullStringEvery([el.firstNames, el.lastName]),
-    ).toList();
+          (el) => !isNullStringEvery([el.firstNames, el.lastName]),
+        )
+        .toList();
     setState(() {
       _all.addAll(
         getDatas
@@ -206,8 +208,13 @@ class _ChildState extends State<_Child> with ScreenRouting {
       title: Text(
           '${_datas[index].lastName ?? ""} ${_datas[index].firstNames ?? ""}'),
       subtitle: Text(_choice.text ?? 'Non attribué'),
-      onTap: () => pushNamed(Routes.setMember,
-          arguments: SetMemberArguments(data: _data)),
+      onTap: () async {
+        retrieve = (await pushNamed(
+          Routes.setMember,
+          arguments: SetMemberArguments(data: _data),
+        ));
+        _datas[index] = retrieve;
+      },
     );
   }
 

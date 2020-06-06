@@ -14,7 +14,7 @@ import 'package:kult/main.dart';
 
 void main() {
   test('Test ReadsMany', () {
-    registerContainer.readMany(Member()).then(expectAsync1((val) {
+    registerContainer.readAll(Member()).then(expectAsync1((val) {
       
     }));
   });

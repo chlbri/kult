@@ -29,7 +29,7 @@ class Register extends UseCase {
     return repoMember.read(uid);
   }
 
-  Future<List<Member>> readMany(Member data) {
+  Future<List<Member>> readAll(Member data) {
     return repoMember.readAll(data);
     // return repoMember.read(uid);
   }

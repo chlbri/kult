@@ -1,26 +1,13 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-
-import 'package:form_field_validator/form_field_validator.dart';
-import 'package:kult/data/datasources/firebase/member.dart';
-import 'package:kult/core/utils.dart';
-import 'package:kult/data/models/member.dart';
-import 'package:kult/domain/entities/choice.dart';
-import 'package:kult/domain/entities/choice_list.dart';
-import 'package:kult/domain/entities/member.dart';
-import 'package:kult/domain/usecases/choose_kult.dart';
-import 'package:kult/domain/usecases/register.dart';
-import 'package:kult/ui/android/router/router.gr.dart';
-import 'package:kult/ui/android/widgets/checkbox_group.dart';
-import 'package:kult/ui/android/widgets/column_form.dart';
-import 'package:kult/ui/android/widgets/kult_choice_button_other.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-import '../../contrats/screen.dart';
-import '../widgets/colum_form_separator.dart';
-import '../widgets/sign_form_field.dart';
+import 'package:kult/domain/entities/choice.dart';
+import 'package:kult/domain/entities/member.dart';
+import 'package:kult/domain/usecases/choose_kult.dart';
+import 'package:kult/ui/android/widgets/checkbox_group.dart';
+
 import '../../contrats/screen_routing.dart';
 import 'input_screen.dart';
 
@@ -202,13 +189,16 @@ class _SetMemberState extends State<_SetMember> with ScreenRouting {
                     direction: Axis.vertical,
                     model: () => member,
                     alert: true,
-                    enabledQuery: (e, [model]) {
-                      return chooseKultContainer.update(Choice()..choice = e,
-                          uid: model().uid);
+                    enabledQuery: (e, [model]) async {
+                      return await chooseKultContainer
+                          .update(Choice()..choice = e, uid: model().uid)
+                          .then((_) => member.choice = e);
                     },
-                    disabledQuery: (e, [model]) {
+                    disabledQuery: (e, [model]) async {
                       print(member.uid);
-                      return chooseKultContainer.remove(model().uid);
+                      return chooseKultContainer
+                          .remove(model().uid)
+                          .then((_) => member.choice = null);
                     },
                   ),
                 ],
@@ -238,7 +228,7 @@ class _SetMemberState extends State<_SetMember> with ScreenRouting {
                   ],
                 ),
                 onPressed: () {
-                  pop();
+                  pop(member);
                 },
               ),
             ],
