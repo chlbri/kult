@@ -7,6 +7,7 @@ import 'package:kult/data/datasources/firebase/services/auth.dart';
 import 'package:kult/data/models/choice.dart';
 import 'package:kult/data/models/member.dart';
 import 'package:kult/domain/entities/member.dart';
+import 'package:kult/domain/usecases/reset_password.dart';
 import 'package:kult/domain/usecases/sign_in.dart';
 import '../router/router.gr.dart';
 import '../widgets/column_form.dart';
@@ -16,8 +17,22 @@ import '../../contrats/screen.dart';
 import '../widgets/sign_form_field.dart';
 import '../../contrats/screen_routing.dart';
 
-class SignIn extends Screen with ScreenRouting {
+class SignIn extends StatefulWidget {
   const SignIn({Key key}) : super(key: key);
+
+  @override
+  _SignInState createState() => _SignInState();
+}
+
+class _SignInState extends State<SignIn> with ScreenRouting {
+  bool _resetPass;
+
+  @override
+  void initState() {
+    super.initState();
+    _resetPass = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final model = Member();
@@ -44,39 +59,52 @@ class SignIn extends Screen with ScreenRouting {
           height: 40,
         ),
         SizedBox(height: 120),
-        ColumnForm(
-          formKey: _formKey,
-          children: [
-            SignFormField(
-              label: 'Email',
-              onChanged: (value) => model.login = value.trim(),
-              validator: RequiredValidator(errorText: "Champ requis"),
-            ),
-            const SizedBox(height: 50),
-            SignFormField(
-              label: 'Mot de passe',
-              onChanged: (value) => model.mdp = value.trim(),
-              validator: RequiredValidator(errorText: "Champ requis"),
-              obscureText: true,
-              keyboard: TextInputType.visiblePassword,
-            ),
-          ],
-        ),
-        SizedBox(height: 50),
-        Material(
-          elevation: 100,
-          color: Colors.transparent,
-          child: InkWell(
-            child: Text(
-              'Mode passe oublié ?',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white,
+        Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal:40),
+              child: Column(
+                children: [
+                  SignFormField(
+                    label: 'Email',
+                    onChanged: (value) => model.login = value.trim(),
+                    validator: MultiValidator([
+                      RequiredValidator(errorText: "Champ requis"),
+                      EmailValidator(errorText: "Email non valide"),
+                    ]),
+                  ),
+                  const SizedBox(height: 50),
+                  if (!_resetPass)
+                    SignFormField(
+                      label: 'Mot de passe',
+                      onChanged: (value) => model.mdp = value.trim(),
+                      validator: RequiredValidator(errorText: "Champ requis"),
+                      obscureText: true,
+                      keyboard: TextInputType.visiblePassword,
+                    ),
+                ],
               ),
+            )),
+        SizedBox(height: 50),
+        if (!_resetPass)
+          Material(
+            elevation: 100,
+            color: Colors.transparent,
+            child: InkWell(
+              child: Text(
+                'Mode passe oublié ?',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () {
+                setState(() {
+                  _resetPass = true;
+                });
+              },
             ),
-            onTap: () {},
           ),
-        ),
       ],
       stackedFields: <Widget>[
         Positioned(
@@ -90,12 +118,14 @@ class SignIn extends Screen with ScreenRouting {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               onPressed: () async {
-                _signIn(model, _formKey, _scaffoldState);
+                _resetPass
+                    ? _resetPassword(model.login, _formKey, _scaffoldState)
+                    : _signIn(model, _formKey, _scaffoldState);
                 //await _auth.signInAnon();
               },
-              child: const Text(
-                "Se connecter",
-                style: TextStyle(color: Color(0xFF25A3BC), fontSize: 18),
+              child: Text(
+                _resetPass ? "Réinitialiser le mot de passe" : "Se connecter",
+                style: TextStyle(color: Color(0xFF25A3BC), fontSize: 16),
               ),
             ),
           ),
@@ -120,6 +150,29 @@ class SignIn extends Screen with ScreenRouting {
       if (await signInFireBaseAuthContainer(model)) {
         pushNamedAndRemoveUntil(Routes.home, (route) => false);
       }
+    }
+  }
+
+  _resetPassword(
+    String data,
+    GlobalKey<FormState> _formKey,
+    GlobalKey<ScaffoldState> _scaffoldState,
+  ) async {
+    if (_formKey.currentState.validate()) {
+      // print(MemberSource(model).login());
+      _scaffoldState.currentState.showSnackBar(
+        SnackBar(
+          content: Text('Réinitialisation ... '),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      resetPasswordFireBaseAuthContainer(data).then(
+        (val) => setState(
+          () {
+            _resetPass = false;
+          },
+        ),
+      );
     }
   }
 }

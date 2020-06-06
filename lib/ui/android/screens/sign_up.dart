@@ -21,13 +21,16 @@ const requiredField = 'Champ obligatoire';
 
 class SignUp extends Screen with ScreenRouting {
   const SignUp({Key key}) : super(key: key);
+
+
   @override
   Widget build(BuildContext context) {
     final Member member = MemberModel();
-    final _formKey = GlobalKey<FormState>();
-    final _scaffoldKey = GlobalKey<ScaffoldState>();
+    final formKey = GlobalKey<FormState>();
+    final scaffoldKey = GlobalKey<ScaffoldState>();
+
     return InputScreen(
-      scaffoldKey: _scaffoldKey,
+      scaffoldKey: scaffoldKey,
       background: BoxDecoration(
         image: DecorationImage(
           image: AssetImage('assets/img/sign_background.png'),
@@ -45,55 +48,58 @@ class SignUp extends Screen with ScreenRouting {
           height: 60,
         ),
         SizedBox(height: 50),
-        ColumnForm(
-          formKey: _formKey,
-          children: [
-            SignFormField(
-              label: 'Nom',
-              onChanged: (val) => member.lastName = val,
-              validator: RequiredValidator(errorText: "Champ requis"),
-            ),
-            COLUMN_FORM_SEPARATOR,
-            SignFormField(
-              label: 'Prénoms',
-              onChanged: (val) => member.firstNames = val,
-              validator: RequiredValidator(errorText: "Champ requis"),
-            ),
-            COLUMN_FORM_SEPARATOR,
-            SignFormField(
-              label: 'Téléphone',
-              keyboard: TextInputType.phone,
-              onChanged: (val) => member.phoneNumber = val,
-              validator: RequiredValidator(errorText: "Champ requis"),
-            ),
-            COLUMN_FORM_SEPARATOR,
-            SignFormField(
-              label: 'Email',
-              keyboard: TextInputType.emailAddress,
-              onChanged: (val) => member.login = val,
-              validator: MultiValidator([
-                RequiredValidator(errorText: "Champ requis"),
-                // EmailValidator(errorText: "Email non valide"),
-              ]),
-            ),
-            COLUMN_FORM_SEPARATOR,
-            SignFormField(
-              label: 'Mot de passe',
-              onChanged: (val) => member.mdp = val,
-              validator: RequiredValidator(errorText: "Champ requis"),
-              obscureText: true,
-            ),
-            COLUMN_FORM_SEPARATOR,
-            SignFormField(
-              label: 'Confirmation',
-              validator: (val) {
-                if (val.isEmpty) return 'Champ requis';
-                if (val != member.mdp) return 'Non identiques';
-                return null;
-              },
-              obscureText: true,
-            ),
-          ],
+        Form(
+          key: formKey,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Column(children:[
+              SignFormField(
+                label: 'Nom',
+                onChanged: (val) => member.lastName = val,
+                validator: RequiredValidator(errorText: "Champ requis"),
+              ),
+              COLUMN_FORM_SEPARATOR,
+              SignFormField(
+                label: 'Prénoms',
+                onChanged: (val) => member.firstNames = val,
+                validator: RequiredValidator(errorText: "Champ requis"),
+              ),
+              COLUMN_FORM_SEPARATOR,
+              SignFormField(
+                label: 'Téléphone',
+                keyboard: TextInputType.phone,
+                onChanged: (val) => member.phoneNumber = val,
+                validator: RequiredValidator(errorText: "Champ requis"),
+              ),
+              COLUMN_FORM_SEPARATOR,
+              SignFormField(
+                label: 'Email',
+                keyboard: TextInputType.emailAddress,
+                onChanged: (val) => member.login = val.trim(),
+                validator: MultiValidator([
+                  RequiredValidator(errorText: "Champ requis"),
+                  EmailValidator(errorText: "Email non valide"),
+                ]),
+              ),
+              COLUMN_FORM_SEPARATOR,
+              SignFormField(
+                label: 'Mot de passe',
+                onChanged: (val) => member.mdp = val,
+                validator: RequiredValidator(errorText: "Champ requis"),
+                obscureText: true,
+              ),
+              COLUMN_FORM_SEPARATOR,
+              SignFormField(
+                label: 'Confirmation',
+                validator: (val) {
+                  if (val.isEmpty) return 'Champ requis';
+                  if (val != member.mdp) return 'Non identiques';
+                  return null;
+                },
+                obscureText: true,
+              ),
+            ],),
+          ),
         ),
         SizedBox(height: 70),
         ButtonTheme(
@@ -103,7 +109,7 @@ class SignUp extends Screen with ScreenRouting {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
             ),
-            onPressed: _signUp(member, _formKey, _scaffoldKey),
+            onPressed: _signUp(member, formKey, scaffoldKey),
             child: const Text(
               "S'inscrire",
               style: TextStyle(color: Color(0xFF25A3BC), fontSize: 18),
@@ -147,7 +153,8 @@ class SignUp extends Screen with ScreenRouting {
           ),
         );
         //member.login = member.lastName;
-        await signUpFireBaseAuthContainer(member).then((value) => member.uid = value);
+        await signUpFireBaseAuthContainer(member)
+            .then((value) => member.uid = value);
 
         if (!isNullString(member.uid)) {
           registerContainer

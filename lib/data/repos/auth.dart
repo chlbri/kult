@@ -20,4 +20,6 @@ class FireStoreAuthContainer extends IAuth {
         data.login,
         data.mdp,
       );
+  @override
+  resetPassword(data) => source.resetPassword(data);
 }

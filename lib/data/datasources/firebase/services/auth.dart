@@ -119,4 +119,16 @@ class FirebaseAuthService {
       return null;
     }
   }
+
+  Future<bool> resetPassword(String email) async {
+    try {
+      return await _auth
+          .sendPasswordResetEmail(email: email)
+          .then((value) => true)
+          .catchError(() => false);
+    } catch (e) {
+      print('Error $e');
+      return false;
+    }
+  }
 }
