@@ -197,7 +197,7 @@ class _ChildState extends State<_Child> with ScreenRouting {
   }
 
   Widget _itemBuilder(BuildContext ctx, int index) {
-    final _data = _datas.elementAt(index);
+    var _data = _datas[index];
     final _choice = _data?.choice;
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -213,7 +213,7 @@ class _ChildState extends State<_Child> with ScreenRouting {
           Routes.setMember,
           arguments: SetMemberArguments(data: _data),
         ));
-        _datas[index] = retrieve;
+        _data = retrieve;
       },
     );
   }

@@ -192,7 +192,7 @@ class _SetMemberState extends State<_SetMember> with ScreenRouting {
                     enabledQuery: (e, [model]) async {
                       return await chooseKultContainer
                           .update(Choice()..choice = e, uid: model().uid)
-                          .then((_) => member.choice = e);
+                          ?.then((_) => member.choice = e);
                     },
                     disabledQuery: (e, [model]) async {
                       print(member.uid);
